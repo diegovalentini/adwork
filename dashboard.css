@@ -1,0 +1,187 @@
+:root{
+  --bg:#0b1220;
+  --card:#0f1a2f;
+  --text:#eaf0ff;
+  --muted:#a9b4d0;
+  --border: rgba(255,255,255,0.10);
+  --primary:#2d6bff;
+  --danger:#ff4d4f;
+  --success:#26c281;
+}
+
+*{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial; }
+body{
+  margin:0;
+  background: radial-gradient(1000px 600px at 20% 0%, rgba(45,107,255,0.25), transparent 60%),
+              radial-gradient(900px 500px at 80% 10%, rgba(38,194,129,0.18), transparent 55%),
+              var(--bg);
+  color: var(--text);
+  min-height:100vh;
+}
+
+.container{ 
+  width: min(980px, 92vw); 
+  margin: 24px auto;
+ }
+
+.topbar{
+  display:flex; 
+  align-items:center; 
+  justify-content:space-between;
+  margin-bottom: 14px;
+  padding-left: 15px;
+}
+
+.brand{ 
+  font-size: 22px; 
+  font-weight: 800; 
+  letter-spacing: -0.4px; 
+}
+.meta{ 
+  color: var(--muted); 
+  font-size: 14px; 
+}
+
+.card{
+  background: rgba(15,26,47,0.80);
+  border: 1px solid var(--border);
+  backdrop-filter: blur(10px);
+  border-radius: 18px;
+  padding: 18px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.25);
+  margin: 10px;
+}
+
+.grid{ 
+ display:grid; 
+ gap:14px; 
+ grid-template-columns: 1fr; }
+@media (min-width: 900px){ 
+  .grid{ grid-template-columns: 1fr 1fr; } 
+}
+
+.btn{
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  cursor:pointer;
+  font-weight: 700;
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+}
+.btn.primary{ 
+  background: var(--primary); 
+  border-color: rgba(45,107,255,0.6); 
+  margin-bottom: 10px; 
+}
+
+.btn.danger{ 
+  background: rgba(255,77,79,0.12); 
+  border-color: rgba(255,77,79,0.35); 
+  color:#ffd6d6; 
+}
+
+.row{ 
+  display:flex; 
+  gap:10px; 
+  flex-wrap:wrap; 
+  align-items:center; 
+}
+.badge{
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  font-size: 12px;
+}
+.badge.on{ 
+  border-color: rgba(38,194,129,0.5); 
+  color:#c8ffe5; 
+}
+.badge.off{ 
+  border-color: rgba(255,77,79,0.45); 
+  color:#ffd6d6;
+ }
+
+input, select, textarea{
+  width:100%;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  outline:none;
+  color-scheme: dark;
+}
+select, option{
+  background: #0f1a2f;        
+  color: #eaf0ff; 
+  -webkit-appearance: none;
+  appearance: auto;
+}
+
+textarea{ 
+  min-height: 90px; 
+  resize: vertical; 
+}
+label{
+  color: var(--muted); 
+  font-size: 13px; 
+  display:flex; 
+  flex-direction:column; 
+  gap:6px; 
+}
+
+.list{ 
+  display:flex; 
+  flex-direction:column; 
+  gap:10px; 
+  margin-top: 10px; 
+}
+
+.item{
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 12px;
+  background: rgba(255,255,255,0.03);
+}
+
+.item .title{ 
+  font-weight: 800;
+ }
+.item .sub{ 
+  color: var(--muted); 
+  font-size: 13px; 
+  margin-top:4px; 
+}
+
+/* Overlay modal */
+.modalOverlay{
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(10px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  z-index: 9999;
+}
+
+.modalOverlay.hidden{ 
+  display:none; 
+}
+
+.modalCard{
+  width: min(700px, 95vw);
+}
+.modalHeader{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom: 10px;
+}
+.modalHeader h3{
+   margin:0; 
+  }
+

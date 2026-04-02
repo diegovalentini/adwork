@@ -1,0 +1,583 @@
+import { auth, db } from "./firebase-config.js";
+import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+
+import {
+  doc,
+  getDoc,
+  setDoc,
+  updateDoc,
+  deleteDoc,
+  addDoc,
+  getDocs,
+  collection,
+  query,
+  where,
+  orderBy,
+  onSnapshot,
+  serverTimestamp,
+} from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+/* =========================
+   DOM refs
+========================= */
+
+// Empresa modal
+const openEditCompany = document.getElementById("openEditCompany");
+const editCompanyModal = document.getElementById("editCompanyModal");
+const closeEditCompany = document.getElementById("closeEditCompany");
+
+// Modal postulados
+const appsModal = document.getElementById("appsModal");
+const closeAppsModal = document.getElementById("closeAppsModal");
+const appsModalTitle = document.getElementById("appsModalTitle");
+const appsModalSub = document.getElementById("appsModalSub");
+const appsModalList = document.getElementById("appsModalList");
+
+const who = document.getElementById("who");
+const logoutBtn = document.getElementById("logoutBtn");
+const form = document.getElementById("jobForm");
+const msg = document.getElementById("msg");
+const businessHistoryList = document.getElementById("businessHistoryList");
+
+// Perfil empresa (card)
+const bCompanyName = document.getElementById("bCompanyName");
+const bCompanyType = document.getElementById("bCompanyType");
+const bCompanyLocation = document.getElementById("bCompanyLocation");
+const bRating = document.getElementById("bRating");
+
+// Edit empresa (modal)
+const businessProfileForm = document.getElementById("businessProfileForm");
+const editCompanyName = document.getElementById("editCompanyName");
+const editCompanyType = document.getElementById("editCompanyType");
+const editCompanyLocation = document.getElementById("editCompanyLocation");
+const editCompanyBio = document.getElementById("editCompanyBio");
+const businessProfileMsg = document.getElementById("businessProfileMsg");
+
+// Listas
+const workersList = document.getElementById("workersList");
+const myJobsList = document.getElementById("myJobsList");
+
+/* =========================
+   State
+========================= */
+let businessUid = null;
+
+// modal postulados
+let currentJobId = null;
+let appsUnsub = null; // para cortar snapshot del modal
+let reqUnsubs = [];   // ✅ para cortar snapshots de contact_requests dentro del modal
+
+/* =========================
+   Modals helpers
+========================= */
+
+// modal editar empresa
+function openCompanyModal() {
+  editCompanyModal.classList.remove("hidden");
+}
+function closeCompanyModal() {
+  editCompanyModal.classList.add("hidden");
+}
+openEditCompany?.addEventListener("click", openCompanyModal);
+closeEditCompany?.addEventListener("click", closeCompanyModal);
+editCompanyModal?.addEventListener("click", (e) => {
+  if (e.target === editCompanyModal) closeCompanyModal();
+});
+
+// modal postulados
+function openAppsModalFn() {
+  appsModal.classList.remove("hidden");
+}
+function closeAppsModalFn() {
+  appsModal.classList.add("hidden");
+  appsModalTitle.textContent = "Postulados";
+  appsModalSub.textContent = "";
+  appsModalList.innerHTML = "";
+  currentJobId = null;
+
+  // ✅ cortar snapshot de applications
+  if (appsUnsub) {
+    appsUnsub();
+    appsUnsub = null;
+  }
+
+  // ✅ cortar snapshots de contact_requests (para que no se acumulen)
+  reqUnsubs.forEach((fn) => {
+    try { fn(); } catch {}
+  });
+  reqUnsubs = [];
+}
+
+closeAppsModal?.addEventListener("click", closeAppsModalFn);
+appsModal?.addEventListener("click", (e) => {
+  if (e.target === appsModal) closeAppsModalFn();
+});
+
+document.addEventListener("keydown", (e) => {
+  if (e.key === "Escape") {
+    closeCompanyModal();
+    closeAppsModalFn();
+  }
+});
+
+/* =========================
+   Render
+========================= */
+
+function renderMyJobs(jobs) {
+  myJobsList.innerHTML = "";
+  if (!jobs.length) {
+    myJobsList.innerHTML = `<div class="meta">Todavía no publicaste turnos.</div>`;
+    return;
+  }
+
+  jobs.forEach((j) => {
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = `
+      <div class="title">${(j.role || "Turno").toUpperCase()} · ${j.zone || ""}</div>
+      <div class="sub">📅 ${j.date || ""} · 🕒 ${j.from || ""}–${j.to || ""} · 💶 €${j.pay ?? ""}/h</div>
+      <div class="sub">Estado: ${j.status || "open"}</div>
+      ${j.notes ? `<div class="sub">📝 ${j.notes}</div>` : ""}
+
+      <div class="row" style="margin-top:10px; gap:10px;">
+        <button class="btn primary" data-action="apps" data-id="${j.id}">Postulados</button>
+        <button class="btn" data-action="close" data-id="${j.id}">Cerrar</button>
+        <button class="btn danger" data-action="delete" data-id="${j.id}">Eliminar</button>
+      </div>
+    `;
+    myJobsList.appendChild(el);
+  });
+}
+
+/* =========================
+   Workers disponibles
+========================= */
+const qWorkers = query(
+  collection(db, "users"),
+  where("role", "==", "worker"),
+  where("availableNow", "==", true)
+);
+
+onSnapshot(qWorkers, (snap) => {
+  const workers = snap.docs.map((d) => d.data());
+
+  workersList.innerHTML = "";
+  if (!workers.length) {
+    workersList.innerHTML = `<div class="meta">No hay trabajadores disponibles ahora.</div>`;
+    return;
+  }
+
+  workers.forEach((w) => {
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = `
+      <div class="row" style="gap:12px; align-items:flex-start;">
+        <img src="${w.photoUrl || "https://via.placeholder.com/64?text=AD"}"
+          style="width:52px;height:52px;border-radius:14px;border:1px solid rgba(255,255,255,0.10);object-fit:cover;background: rgba(255,255,255,0.04);" />
+        <div style="flex:1;">
+          <div class="title">${w.name || "Trabajador"}</div>
+          <div class="sub">${w.location ? `📍 ${w.location}` : ""}</div>
+          <div class="sub">${w.bio ? `📝 ${w.bio}` : ""}</div>
+          <div class="sub">${w.availableDays?.length ? `📅 ${w.availableDays.join(", ")}` : ""}</div>
+          <div class="sub">${w.availableHours ? `⏰ ${w.availableHours}` : ""}</div>
+        </div>
+
+        <div class="row" style="gap:10px;">
+        <button class="btn primary reqContactWorkerBtn" data-workeruid="${w.uid}" disabled>
+            Solicitar contacto
+        </button>
+        </div>
+      </div>
+    `;
+    workersList.appendChild(el);
+  });
+});
+
+/* =========================
+   Auth
+========================= */
+onAuthStateChanged(auth, async (user) => {
+  if (!user) return (window.location.href = "./index.html");
+  businessUid = user.uid;
+
+  const snap = await getDoc(doc(db, "users", user.uid));
+  const profile = snap.exists() ? snap.data() : {};
+
+  if (profile.role !== "business") return (window.location.href = "./index.html");
+  workersList.querySelectorAll(".reqContactWorkerBtn").forEach(b => b.disabled = false);
+
+
+  // UI empresa
+  bCompanyName.textContent = profile.companyName || "—";
+  bCompanyType.textContent = profile.companyType ? `🏷️ ${profile.companyType}` : "🏷️ (sin rubro)";
+  bCompanyLocation.textContent = profile.companyLocation ? `📍 ${profile.companyLocation}` : "📍 (sin locación)";
+  bRating.textContent = `⭐ ${profile.ratingAvg || 0} (${profile.ratingCount || 0})`;
+
+  editCompanyName.value = profile.companyName || "";
+  editCompanyType.value = profile.companyType || "hotel";
+  editCompanyLocation.value = profile.companyLocation || "";
+  editCompanyBio.value = profile.companyBio || "";
+
+  who.textContent = `Panel Negocio`;
+
+  // Mis jobs del negocio
+  const qJobs = query(
+    collection(db, "jobs"),
+    where("businessUid", "==", businessUid),
+    orderBy("createdAt", "desc")
+  );
+
+  onSnapshot(qJobs, (jobsSnap) => {
+    const jobs = jobsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
+    renderMyJobs(jobs);
+  });
+
+  // Historial negocio
+  const qHist = query(
+    collection(db, "business_history"),
+    where("businessUid", "==", businessUid)
+  );
+
+  onSnapshot(qHist, (snapH) => {
+    businessHistoryList.innerHTML = "";
+
+    const items = snapH.docs.map(d => ({ id: d.id, ...d.data() }));
+    items.sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+    if (items.length === 0) {
+      businessHistoryList.innerHTML = `<div class="meta">Todavía no tenés historial.</div>`;
+      return;
+    }
+
+    items.forEach((h) => {
+      const el = document.createElement("div");
+      el.className = "item";
+      el.innerHTML = `
+        <div class="title">${(h.role || "Turno").toUpperCase()} · ${h.zone || ""}</div>
+        <div class="sub">📅 ${h.date || ""} · 🕒 ${h.from || ""}–${h.to || ""} · 💶 €${h.pay ?? ""}/h</div>
+        <div class="sub">👤 Worker: ${h.workerUid || ""}</div>
+      `;
+      businessHistoryList.appendChild(el);
+    });
+  });
+});
+
+/* =========================
+   Logout
+========================= */
+logoutBtn.addEventListener("click", async () => {
+  await signOut(auth);
+  window.location.href = "./index.html";
+});
+
+/* =========================
+   Publicar turno
+========================= */
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!businessUid) return;
+
+  msg.textContent = "Publicando...";
+
+  const data = {
+    businessUid,
+    role: document.getElementById("role").value,
+    date: document.getElementById("date").value,
+    from: document.getElementById("from").value,
+    to: document.getElementById("to").value,
+    pay: Number(document.getElementById("pay").value),
+    zone: document.getElementById("zone").value.trim(),
+    notes: document.getElementById("notes").value.trim(),
+    status: "open",
+    createdAt: serverTimestamp(),
+  };
+
+  try {
+    await addDoc(collection(db, "jobs"), data);
+    msg.textContent = "Turno publicado ✅";
+    form.reset();
+  } catch (err) {
+    msg.textContent = err.message;
+  }
+});
+
+/* =========================
+   Guardar perfil empresa
+========================= */
+businessProfileForm.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  if (!businessUid) return;
+
+  businessProfileMsg.textContent = "Guardando...";
+
+  try {
+    const payload = {
+      companyName: editCompanyName.value.trim(),
+      companyType: editCompanyType.value,
+      companyLocation: editCompanyLocation.value.trim(),
+      companyBio: editCompanyBio.value.trim(),
+    };
+
+    await updateDoc(doc(db, "users", businessUid), payload);
+
+    bCompanyName.textContent = payload.companyName || "—";
+    bCompanyType.textContent = payload.companyType ? `🏷️ ${payload.companyType}` : "🏷️ (sin rubro)";
+    bCompanyLocation.textContent = payload.companyLocation ? `📍 ${payload.companyLocation}` : "📍 (sin locación)";
+
+    businessProfileMsg.textContent = "Actualizado ✅";
+    closeCompanyModal();
+  } catch (err) {
+    console.error(err);
+    businessProfileMsg.textContent = err.message;
+  }
+});
+
+/* =========================
+   Clicks en Mis turnos (Postulados / Cerrar / Eliminar)
+========================= */
+myJobsList.addEventListener("click", async (e) => {
+  const btn = e.target.closest("button[data-action]");
+  if (!btn) return;
+
+  const id = btn.dataset.id;
+  const action = btn.dataset.action;
+  if (!id) return;
+
+  // POSTULADOS
+  if (action === "apps") {
+    currentJobId = id;
+
+    openAppsModalFn();
+    appsModalTitle.textContent = "Postulados";
+    appsModalSub.textContent = "Cargando...";
+    appsModalList.innerHTML = "";
+
+    // cortar listener anterior
+    if (appsUnsub) {
+      appsUnsub();
+      appsUnsub = null;
+    }
+
+    // cortar listeners de requests anteriores
+    reqUnsubs.forEach((fn) => { try { fn(); } catch {} });
+    reqUnsubs = [];
+
+    const qApps = query(collection(db, "applications"), where("jobId", "==", currentJobId));
+
+    appsUnsub = onSnapshot(qApps, async (snap) => {
+      appsModalSub.textContent = `Total: ${snap.size}`;
+      appsModalList.innerHTML = "";
+
+      if (snap.size === 0) {
+        appsModalList.innerHTML = `<div class="meta">Todavía nadie se postuló.</div>`;
+        return;
+      }
+
+      for (const d of snap.docs) {
+        const a = d.data();
+
+        const uSnap = await getDoc(doc(db, "users", a.workerUid));
+        const u = uSnap.exists() ? uSnap.data() : {};
+
+        const row = document.createElement("div");
+        row.className = "item";
+
+        const requestId = `${currentJobId}_${a.workerUid}`;
+        const appStatus = a.status || "applied";
+
+        row.innerHTML = `
+          <div class="row" style="gap:12px; align-items:flex-start;">
+            <img src="${u.photoUrl || "https://via.placeholder.com/56?text=AD"}"
+                 style="width:56px;height:56px;border-radius:14px;object-fit:cover;border:1px solid rgba(255,255,255,0.10);" />
+
+            <div style="flex:1;">
+              <div class="title">${u.name || "Trabajador"}</div>
+              <div class="sub">📍 ${u.location || "(sin locación)"}</div>
+              <div class="sub">📝 ${u.bio || "(sin descripción)"}</div>
+              <div class="sub">📅 ${u.availableDays?.length ? u.availableDays.join(", ") : "(sin días)"}</div>
+              <div class="sub">⏰ ${u.availableHours || "(sin horario)"}</div>
+
+              <div class="contactBox" style="margin-top:10px;"></div>
+
+              <div class="row actionsRow" style="margin-top:10px; gap:10px;">
+                ${
+                  appStatus === "applied"
+                    ? `<button class="btn primary acceptBtn" data-jobid="${currentJobId}" data-workeruid="${a.workerUid}">Aceptar</button>`
+                    : ``
+                }
+                <span class="badge on">${appStatus === "accepted" ? "Aceptado ✅" : appStatus === "rejected" ? "Rechazado ❌" : "Postulado ✅"}</span>
+              </div>
+            </div>
+          </div>
+        `;
+
+        appsModalList.appendChild(row);
+
+        // ✅ acá pintamos contacto EN VIVO
+        const contactBox = row.querySelector(".contactBox");
+        const actionsRow = row.querySelector(".actionsRow");
+
+        const unsubReq = onSnapshot(doc(db, "contact_requests", requestId), (reqSnap) => {
+          const req = reqSnap.exists() ? reqSnap.data() : null;
+          const status = req?.status || "none";
+          const c = req?.contact || {};
+
+          let contactHTML = `<div class="sub">📩 Contacto: <span class="meta">(todavía no solicitado)</span></div>`;
+
+          if (status === "pending") {
+            contactHTML = `<div class="sub">📩 Contacto: <span class="meta">Pendiente de compartir…</span></div>`;
+          } else if (status === "declined") {
+            contactHTML = `<div class="sub">📩 Contacto: <span class="meta">Rechazado por el trabajador</span></div>`;
+          } else if (status === "shared") {
+            contactHTML = `
+              <div class="sub">📩 Contacto:</div>
+              ${c.whatsapp ? `<div class="sub">🟢 WhatsApp: <b>${c.whatsapp}</b></div>` : ""}
+              ${c.phone ? `<div class="sub">📞 Tel: <b>${c.phone}</b></div>` : ""}
+              ${c.email ? `<div class="sub">✉️ Email: <b>${c.email}</b></div>` : ""}
+            `;
+          }
+
+          if (contactBox) contactBox.innerHTML = contactHTML;
+
+          // ✅ si ya hay request creado, NO mostramos "Aceptar" (evita confusión)
+          if (status === "pending" || status === "shared" || status === "declined") {
+            const acceptBtn = actionsRow?.querySelector(".acceptBtn");
+            if (acceptBtn) acceptBtn.remove();
+          }
+        });
+
+        reqUnsubs.push(unsubReq);
+      }
+    });
+
+    return;
+  }
+
+  // CERRAR
+  if (action === "close") {
+    await updateDoc(doc(db, "jobs", id), {
+      status: "closed",
+      closedAt: serverTimestamp(),
+    });
+    return;
+  }
+
+  // ELIMINAR
+  if (action === "delete") {
+    if (!confirm("¿Eliminar este turno?")) return;
+    await deleteDoc(doc(db, "jobs", id));
+    return;
+  }
+});
+
+/* =========================
+   Aceptar postulante (delegado en modal)
+========================= */
+appsModalList.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".acceptBtn");
+  if (!btn) return;
+
+  const jobId = btn.dataset.jobid;
+  const workerUid = btn.dataset.workeruid;
+  if (!jobId || !workerUid) return;
+
+  btn.disabled = true;
+  btn.textContent = "Aceptando...";
+
+  try {
+    // 1) Cerrar job + asignar worker
+    await updateDoc(doc(db, "jobs", jobId), {
+      status: "filled",
+      assignedWorkerUid: workerUid,
+      filledAt: serverTimestamp(),
+    });
+
+    // 2) Marcar applications: accepted / rejected
+    const qAll = query(collection(db, "applications"), where("jobId", "==", jobId));
+    const allSnap = await getDocs(qAll);
+
+    for (const a of allSnap.docs) {
+      const data = a.data();
+      await updateDoc(doc(db, "applications", a.id), {
+        status: data.workerUid === workerUid ? "accepted" : "rejected",
+      });
+    }
+
+    // 3) Crear solicitud de contacto
+    const requestId = `${jobId}_${workerUid}`;
+    await setDoc(doc(db, "contact_requests", requestId), {
+      jobId,
+      businessUid,
+      workerUid,
+      status: "pending",
+      createdAt: serverTimestamp(),
+      type: "job",
+    });
+
+    // 4) Guardar en historial de empresa
+    const jobSnap2 = await getDoc(doc(db, "jobs", jobId));
+    const jobData2 = jobSnap2.exists() ? jobSnap2.data() : {};
+
+    await setDoc(doc(db, "business_history", requestId), {
+      businessUid,
+      jobId,
+      workerUid,
+      createdAt: serverTimestamp(),
+      role: jobData2.role || "",
+      date: jobData2.date || "",
+      from: jobData2.from || "",
+      to: jobData2.to || "",
+      pay: jobData2.pay ?? null,
+      zone: jobData2.zone || "",
+    });
+
+    btn.textContent = "Aceptado ✅";
+    btn.remove(); // ✅ para que no aparezca más
+  } catch (err) {
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = "Aceptar";
+    alert(err.message);
+  }
+});
+
+/* =========================
+   Solicitar contacto directo desde "Trabajadores disponibles"
+========================= */
+workersList.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".reqContactWorkerBtn");
+  if (!btn) return;
+
+  const workerUid = btn.dataset.workeruid;
+  const businessUidNow = auth.currentUser?.uid; // ✅ el UID real en ese instante
+
+  if (!workerUid) return alert("No encontré el workerUid del botón.");
+  if (!businessUidNow) return alert("Todavía no cargó tu sesión. Esperá 2 segundos y probá de nuevo.");
+
+  btn.disabled = true;
+  const prevText = btn.textContent;
+  btn.textContent = "Enviando...";
+
+  try {
+    // requestId único (sin job)
+    const requestId = `direct_${businessUidNow}_${workerUid}`;
+
+    await setDoc(doc(db, "contact_requests", requestId), {
+      jobId: null,
+      businessUid: businessUidNow, // ✅ seguro
+      workerUid,
+      status: "pending",
+      createdAt: serverTimestamp(),
+      type: "direct",
+    });
+
+    btn.textContent = "Solicitud enviada ✅";
+  } catch (err) {
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = prevText || "Solicitar contacto";
+    alert(err.message);
+  }
+});
+

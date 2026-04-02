@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AdWork - Trabajador</title>
+  <link rel="stylesheet" href="dashboard.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="topbar">
+      <div>
+        <div class="brand">AdWork</div>
+        <div id="who" class="meta">Cargando...</div>
+      </div>
+      <div class="row">
+        <span id="availabilityBadge" class="badge off">🔴 No disponible</span>
+        <button id="toggleAvail" class="btn primary">Cambiar estado</button>
+        <button id="logoutBtn" class="btn danger">Salir</button>
+      </div>
+    </div>
+
+    <div class="grid">
+      <section class="card">
+  <h3>Solicitudes de contacto</h3>
+  <div class="list" id="contactReqList"></div>
+</section>
+      <section class="card">
+        <h3>Turnos disponibles</h3>
+        <div class="list" id="jobsList"></div>
+      </section>
+      <section class="card">
+  <h3>Mis postulaciones</h3>
+  <div class="list" id="myAppsList"></div>
+      </section>
+      <section class="card">
+  <h3>Historial</h3>
+  <div class="list" id="workerHistoryList"></div>
+      </section>
+      <section class="card">
+  <div class="row" style="justify-content:space-between;">
+    <h3 style="margin:0;">Mi perfil</h3>
+    <button id="openEditProfile" class="btn primary">Editar</button>
+  </div>
+
+  <div class="item" style="margin-top:12px;">
+    <div class="row" style="gap:12px; align-items:flex-start;">
+      <img id="profilePhoto"
+        style="width:64px;height:64px;border-radius:16px;object-fit:cover;"
+      />
+
+      <div>
+        <div class="title" id="pName">—</div>
+        <div class="sub" id="pRole">—</div>
+        <div class="sub" id="pLocation">—</div>
+        <div class="sub" id="pBio">—</div>
+        <div class="sub" id="pDays">—</div>
+        <div class="sub" id="pHours">—</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+
+
+  <!-- Modal Editar Perfil -->
+<div id="editProfileModal" class="modalOverlay hidden">
+  <div class="card modalCard">
+    <div class="modalHeader">
+      <h3>Editar perfil</h3>
+      <button id="closeEditProfile" class="btn">✕</button>
+    </div>
+    <form id="profileForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
+      <label>Nombre
+        <input id="editName" type="text" />
+      </label>
+
+      <label>Locación
+        <input id="editLocation" type="text" />
+      </label>
+
+      <label>Días disponibles</label>
+      <div class="row" style="gap:10px; flex-wrap:wrap;">
+        <label class="badge"><input type="checkbox" class="dayChk" value="Lun"> Lun</label>
+        <label class="badge"><input type="checkbox" class="dayChk" value="Mar"> Mar</label>
+        <label class="badge"><input type="checkbox" class="dayChk" value="Mié"> Mié</label>
+        <label class="badge"><input type="checkbox" class="dayChk" value="Jue"> Jue</label>
+        <label class="badge"><input type="checkbox" class="dayChk" value="Vie"> Vie</label>
+        <label class="badge"><input type="checkbox" class="dayChk" value="Sáb"> Sáb</label>
+        <label class="badge"><input type="checkbox" class="dayChk" value="Dom"> Dom</label>
+      </div>
+
+      <label>Horario disponible
+        <input id="editHours" type="text" />
+      </label>
+
+      <label>Foto de perfil
+        <input id="editPhotoFile" type="file" accept="image/*" />
+      </label>
+
+      <img id="photoPreview"
+        style="width:72px;height:72px;border-radius:16px;object-fit:cover;" />
+        <div id="uploadHint" class="meta">Subí una imagen (jpg/png)</div>
+
+      <label>Descripción
+        <textarea id="editBio"></textarea>
+      </label>
+
+      <button class="btn primary" type="submit">Guardar cambios</button>
+      <div id="profileMsg" class="meta"></div>
+    </form>
+  </div>
+</div>
+<div id="shareContactModal" class="modalOverlay hidden">
+  <div class="card modalCard">
+    <div class="modalHeader">
+      <h3>Compartir contacto</h3>
+      <button id="closeShareContact" class="btn">✕</button>
+    </div>
+
+    <form id="shareContactForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
+      <input type="hidden" id="shareReqId" />
+
+      <label>WhatsApp (opcional)
+        <input id="shareWhatsapp" type="text" placeholder="+376..." />
+      </label>
+
+      <label>Teléfono (opcional)
+        <input id="sharePhone" type="text" placeholder="+376..." />
+      </label>
+
+      <label>Email (opcional)
+        <input id="shareEmail" type="email" placeholder="tu@email.com" />
+      </label>
+
+      <button class="btn primary" type="submit">Compartir</button>
+      <div id="shareContactMsg" class="meta"></div>
+    </form>
+  </div>
+</div>
+
+  <script type="module" src="firebase-config.js"></script>
+  <script type="module" src="dashboard-worker.js"></script>
+</body>
+</html>

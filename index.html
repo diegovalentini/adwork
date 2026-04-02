@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>AdWork - Login</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <main class="container">
+      <header class="header">
+        <div class="logo">AdWork</div>
+        <p class="subtitle">Extras y turnos por horas en Andorra</p>
+      </header>
+
+      <section id="authCard" class="card">
+        <div class="tabs">
+          <button id="tabLogin" class="tab active">Iniciar sesión</button>
+          <button id="tabRegister" class="tab">Registrarme</button>
+        </div>
+
+        <!-- LOGIN -->
+        <form id="loginForm" class="form">
+          <label>
+            Email
+            <input id="loginEmail" type="email" placeholder="tu@email.com" required />
+          </label>
+
+          <label>
+            Contraseña
+            <input id="loginPassword" type="password" placeholder="••••••••" required />
+          </label>
+
+          <button type="submit" class="btn primary">Entrar</button>
+
+          <button type="button" id="resetBtn" class="btn ghost">
+            ¿Olvidaste tu contraseña?
+          </button>
+        </form>
+
+        <!-- REGISTER -->
+        <form id="registerForm" class="form hidden">
+          <label>
+            Nombre
+            <input id="regName" type="text" placeholder="Diego" required />
+          </label>
+
+          <label>
+            Email
+            <input id="regEmail" type="email" placeholder="tu@email.com" required />
+          </label>
+
+          <label>
+            Contraseña
+            <input id="regPassword" type="password" placeholder="Mínimo 6 caracteres" minlength="6" required />
+          </label>
+
+          <label>
+            Soy
+            <select id="regRole" required>
+              <option value="worker">Trabajador (extras)</option>
+              <option value="business">Negocio (hotel/restaurante)</option>
+            </select>
+          </label>
+          <div id="businessFields" class="hidden">
+  <label>Nombre de la empresa
+    <input id="regCompanyName" type="text" placeholder="Ej: Hotel Nevada" />
+  </label>
+
+  <label>Rubro
+    <select id="regCompanyType">
+      <option value="hotel">Hotel</option>
+      <option value="restaurante">Restaurante</option>
+      <option value="comercio">Comercio</option>
+      <option value="otros">Otros</option>
+    </select>
+  </label>
+
+  <label>Locación
+    <input id="regCompanyLocation" type="text" placeholder="Ej: Escaldes" />
+  </label>
+</div>
+
+          <button type="submit" class="btn primary">Crear cuenta</button>
+        </form>
+
+        <div id="msg" class="msg" aria-live="polite"></div>
+      </section>
+
+      <section id="afterLogin" class="card hidden">
+        <h2 class="title">Sesión iniciada ✅</h2>
+        <p id="userInfo" class="subtitle"></p>
+        <button id="logoutBtn" class="btn danger">Cerrar sesión</button>
+      </section>
+    </main>
+
+    <script type="module" src="firebase-config.js"></script>
+    <script type="module" src="app.js"></script>
+  </body>
+</html>
