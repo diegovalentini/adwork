@@ -52,6 +52,7 @@ let workerUid = null;
 let currentUid = null;
 let currentAvailable = false;
 let latestJobs = [];
+let currentWorkerName = "";
 
 
 /* =========================
@@ -181,7 +182,7 @@ document.addEventListener("keydown", (e) => {
 });
 
 /* =========================
-   Jobs render
+  Jobs render
 ========================= */
 function renderAvailableJobs(jobs) {
   if (!jobsList) return;
@@ -269,6 +270,7 @@ safeOn(jobsList, "click", async (e) => {
       workerUid,
       createdAt: serverTimestamp(),
       status: "applied",
+      workerName: currentWorkerName || "Trabajador",
     });
 
     // actualizamos set en vivo (sin esperar snapshot)
@@ -368,6 +370,7 @@ onSnapshot(qWHist, (snap) => {
   // Perfil user
   const snap = await getDoc(doc(db, "users", user.uid));
   const profile = snap.exists() ? snap.data() : {};
+  currentWorkerName = profile.name || "Trabajador";
 
   // seguridad simple
   if (profile.role !== "worker") return (window.location.href = "./index.html");
@@ -426,6 +429,8 @@ rerenderLists();
 );
 
 onSnapshot(qReq, async (snap) => {
+  console.log("Solicitudes pendientes para worker:", workerUid, "cantidad:", snap.size);
+  snap.docs.forEach((d) => console.log("REQ:", d.id, d.data()));
   if (!contactReqList) return;
   contactReqList.innerHTML = "";
 
@@ -434,27 +439,42 @@ onSnapshot(qReq, async (snap) => {
     return;
   }
 
-  for (const d of snap.docs) {
-    const r = d.data();
+for (const d of snap.docs) {
+  const r = d.data();
 
-    // Traer perfil de empresa para mostrar nombre
-    const bSnap = await getDoc(doc(db, "users", r.businessUid));
-    const b = bSnap.exists() ? bSnap.data() : {};
+  // Empresa
+  const bSnap = await getDoc(doc(db, "users", r.businessUid));
+  const b = bSnap.exists() ? bSnap.data() : {};
 
-    const row = document.createElement("div");
-    row.className = "item";
-    row.innerHTML = `
-      <div class="title">${b.companyName || "Empresa"}</div>
-      <div class="sub">
-        ${r.jobId ? `Quiere tu contacto para el turno: ${r.jobId}` : "Quiere tu contacto (sin turno)"}
-      </div>
-      <div class="row" style="margin-top:10px; gap:10px;">
-        <button class="btn primary shareContactBtn" data-id="${d.id}">Compartir contacto</button>
-        <button class="btn danger declineContactBtn" data-id="${d.id}">Rechazar</button>
-      </div>
-    `;
-    contactReqList.appendChild(row);
+  // 🔥 NUEVO: traer datos del turno
+  let jobText = "Quiere tu contacto (sin turno)";
+
+  if (r.jobId) {
+    const jobSnap = await getDoc(doc(db, "jobs", r.jobId));
+    const job = jobSnap.exists() ? jobSnap.data() : null;
+
+    if (job) {
+      jobText = `
+        <div class="sub">Quiere tu contacto para este turno:</div>
+        <div class="sub">📅 ${job.date || ""} · 🕒 ${job.from || ""}-${job.to || ""}</div>
+        <div class="sub">💼 ${(job.role || "Turno").toUpperCase()} · 📍 ${job.zone || ""}</div>
+      `;
+    }
   }
+
+  const row = document.createElement("div");
+  row.className = "item";
+  row.innerHTML = `
+    <div class="title">${b.companyName || "Empresa"}</div>
+    ${jobText}
+    <div class="row" style="margin-top:10px; gap:10px;">
+      <button class="btn primary shareContactBtn" data-id="${d.id}">Compartir contacto</button>
+      <button class="btn danger declineContactBtn" data-id="${d.id}">Rechazar</button>
+    </div>
+  `;
+
+  contactReqList.appendChild(row);
+}
 });
 });
 

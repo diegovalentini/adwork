@@ -30,6 +30,7 @@ const registerForm = document.getElementById("registerForm");
 // Forms
 const loginEmail = document.getElementById("loginEmail");
 const loginPassword = document.getElementById("loginPassword");
+const acceptTerms = document.getElementById("acceptTerms");
 
 const regName = document.getElementById("regName");
 const regEmail = document.getElementById("regEmail");
@@ -74,6 +75,10 @@ tabRegister.addEventListener("click", () => setActiveTab("register"));
 // REGISTER
 registerForm.addEventListener("submit", async (e) => {
   e.preventDefault();
+  if (!acceptTerms.checked) {
+  showMessage("Debes aceptar los términos y condiciones.", "error");
+  return;
+  }
   showMessage("Creando cuenta...", "info");
 
   try {

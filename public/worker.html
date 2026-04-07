@@ -9,35 +9,22 @@
 <body>
   <div class="container">
     <div class="topbar">
-      <div>
-        <div class="brand">AdWork</div>
-        <div id="who" class="meta">Cargando...</div>
+        <div class="topbar-header">
+          <div class="brand">AdWork</div>
+        </div>
+      
+        <div class="topbar-sub">
+          <span id="availabilityBadge" class="badge off">🔴 No disponible</span>
+          <button id="toggleAvail" class="btn primary">Cambiar estado</button>
+        
+          <button id="logoutBtn" class="logout-icon-btn" aria-label="Cerrar sesión">
+            <img src="icons/salida.png" alt="Cerrar sesión" />
+          </button>
+        </div>
       </div>
-      <div class="row">
-        <span id="availabilityBadge" class="badge off">🔴 No disponible</span>
-        <button id="toggleAvail" class="btn primary">Cambiar estado</button>
-        <button id="logoutBtn" class="btn danger">Salir</button>
-      </div>
-    </div>
 
     <div class="grid">
-      <section class="card">
-  <h3>Solicitudes de contacto</h3>
-  <div class="list" id="contactReqList"></div>
-</section>
-      <section class="card">
-        <h3>Turnos disponibles</h3>
-        <div class="list" id="jobsList"></div>
-      </section>
-      <section class="card">
-  <h3>Mis postulaciones</h3>
-  <div class="list" id="myAppsList"></div>
-      </section>
-      <section class="card">
-  <h3>Historial</h3>
-  <div class="list" id="workerHistoryList"></div>
-      </section>
-      <section class="card">
+            <section class="card">
   <div class="row" style="justify-content:space-between;">
     <h3 style="margin:0;">Mi perfil</h3>
     <button id="openEditProfile" class="btn primary">Editar</button>
@@ -59,6 +46,22 @@
             </div>
           </div>
         </div>
+      </section>
+      <section class="card">
+  <h3>Solicitudes de contacto</h3>
+  <div class="list" id="contactReqList"></div>
+</section>
+      <section class="card">
+        <h3>Turnos disponibles</h3>
+        <div class="list" id="jobsList"></div>
+      </section>
+      <section class="card">
+  <h3>Mis postulaciones</h3>
+  <div class="list" id="myAppsList"></div>
+      </section>
+      <section class="card">
+  <h3>Historial</h3>
+  <div class="list" id="workerHistoryList"></div>
       </section>
     </div>
   </div>
@@ -142,5 +145,15 @@
 
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dashboard-worker.js"></script>
+
+  <footer class="footer">
+  <div style="margin-bottom:6px;">
+    <a href="terms.html">Términos</a> · 
+    <a href="privacy.html">Privacidad</a>
+  </div>
+  <div>
+    © 2026 AdWork · contacto: adwork.contacto@gmail.com
+  </div>
+</footer>
 </body>
 </html>

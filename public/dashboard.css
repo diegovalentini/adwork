@@ -17,25 +17,80 @@ body{
               var(--bg);
   color: var(--text);
   min-height:100vh;
+  display: flex;
+  flex-direction: column;
 }
 
 .container{ 
   width: min(980px, 92vw); 
   margin: 24px auto;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
  }
 
 .topbar{
-  display:flex; 
-  align-items:center; 
-  justify-content:space-between;
-  margin-bottom: 14px;
-  padding-left: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 18px;
+  padding: 4px 9px;
+}
+
+.topbar-header{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  width: 100%;
+  padding: 0px;
+  margin: 0px;
+}
+
+.topbar-sub{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+
+}
+/* Boton logout xd */
+.logout-icon-btn{
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  border: 1px solid rgba(255,77,79,0.35);
+  background: rgba(255,77,79,0.12);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.logout-icon-btn:hover{
+  background: rgba(255,77,79,0.18);
+  border-color: rgba(255,77,79,0.5);
+}
+
+.logout-icon-btn img{
+  width: 20px;
+  height: 20px;
+  object-fit: contain;
+  display: block;
+  filter: brightness(0) invert(1);
 }
 
 .brand{ 
   font-size: 22px; 
   font-weight: 800; 
-  letter-spacing: -0.4px; 
+  letter-spacing: -0.4px;
+  line-height: 1;
+  margin: 0;
+  white-space: nowrap;
 }
 .meta{ 
   color: var(--muted); 
@@ -50,12 +105,56 @@ body{
   padding: 18px;
   box-shadow: 0 10px 30px rgba(0,0,0,0.25);
   margin: 10px;
+  display: flex;
+  flex-direction: column;
+  max-height: 800px;
 }
 
-.grid{ 
- display:grid; 
- gap:14px; 
- grid-template-columns: 1fr; }
+/* el contenido interno que scrollea */
+.card .list {
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 4px; 
+}
+
+.card .list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.card .list::-webkit-scrollbar-thumb {
+  background: rgba(255,255,255,0.2);
+  border-radius: 10px;
+}
+
+.card .list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.grid{
+  display:grid; 
+  gap:14px; 
+  grid-template-columns: 1fr;
+  flex: 1;
+  align-items: stretch;
+}
+
+.footer{
+  margin-top: 40px;
+  padding-bottom: 20px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.footer a{
+  color: var(--muted);
+  text-decoration: none;
+}
+
+.footer a:hover{
+  text-decoration: underline;
+}
+
 @media (min-width: 900px){ 
   .grid{ grid-template-columns: 1fr 1fr; } 
 }
@@ -72,7 +171,6 @@ body{
 .btn.primary{ 
   background: var(--primary); 
   border-color: rgba(45,107,255,0.6); 
-  margin-bottom: 10px; 
 }
 
 .btn.danger{ 
@@ -148,11 +246,12 @@ label{
 
 .item .title{ 
   font-weight: 800;
- }
+}
 .item .sub{ 
-  color: var(--muted); 
-  font-size: 13px; 
-  margin-top:4px; 
+  color: var(--muted);
+  font-size: 13px;
+  margin-top: 6px;
+  line-height: 1.4;
 }
 
 /* Overlay modal */
@@ -182,6 +281,106 @@ label{
   margin-bottom: 10px;
 }
 .modalHeader h3{
-   margin:0; 
+  margin:0; 
+  }
+.worker-card{
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.worker-top{
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.worker-photo{
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  object-fit: cover;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.04);
+  flex-shrink: 0;
+}
+
+.worker-actions{
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.worker-contact-btn{
+  padding: 8px 12px;
+  font-size: 13px;
+  line-height: 1.2;
+  border-radius: 12px;
+  white-space: nowrap;
+}
+
+.worker-info{
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.worker-info .title{
+  margin-bottom: 4px;
+}
+
+.worker-info .sub{
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.45;
+  word-break: break-word;
+}
+
+@media (min-width: 768px){
+  .topbar{
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
   }
 
+  .topbar-header{
+    justify-content: flex-start;
+    width: auto;
+    flex: 1;
+  }
+
+  .topbar-sub{
+    justify-content: flex-end;
+    flex-wrap: nowrap;
+  }
+  .item{
+    padding: 14px;
+  }
+  .worker-card{
+    grid-template-columns: 52px 1fr auto;
+    gap: 10px;
+  }
+
+  .worker-photo{
+    width: 52px;
+    height: 52px;
+  }
+
+  .worker-contact-btn{
+    padding: 7px 10px;
+    font-size: 12px;
+    border-radius: 10px;
+  }
+
+  .worker-info .title{
+    font-size: 15px;
+    line-height: 1.2;
+  }
+
+  .worker-info .sub{
+    font-size: 12px;
+    line-height: 1.4;
+  }
+}

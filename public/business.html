@@ -17,9 +17,12 @@
         <button id="logoutBtn" class="btn danger">Salir</button>
       </div>
     </div>
-    <section class="card">
-  <h3>Mi empresa</h3>
-  <button id="openEditCompany" class="btn primary">Editar</button>
+<section class="card">
+  <div class="row" style="justify-content:space-between; margin-bottom:12px;">
+    <h3 style="margin:0;">Mi empresa</h3>
+    <button id="openEditCompany" class="btn primary">Editar</button>
+  </div>
+
   <div class="item">
     <div class="title" id="bCompanyName">—</div>
     <div class="sub" id="bCompanyType">—</div>
@@ -37,6 +40,7 @@
               <option value="cocina">Cocina</option>
               <option value="limpieza">Limpieza</option>
               <option value="recepcion">Recepción</option>
+              <option value="pica">Pica</option>
               <option value="otros">Otros</option>
             </select>
           </label>
@@ -83,9 +87,14 @@
 
       <section class="card">
         <h3>Trabajadores disponibles </h3>
-        <p class="meta">Luego lo conectamos a Firestore filtrando por <b>availableNow=true</b>.</p>
         <div class="list" id="workersList"></div>
       </section>
+
+      <section class="card">
+        <h3>Contactos</h3>
+        <div class="list" id="contactsList"></div>
+      </section>
+      
     </div>
   </div>
   <!-- Modal Editar Empresa -->
@@ -137,5 +146,14 @@
 </div>
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dashboard-business.js"></script>
+<footer class="footer">
+  <div style="margin-bottom:6px;">
+    <a href="terms.html">Términos</a> · 
+    <a href="privacy.html">Privacidad</a>
+  </div>
+  <div>
+    © 2026 AdWork · contacto: adwork.contacto@gmail.com
+  </div>
+</footer>
 </body>
 </html>

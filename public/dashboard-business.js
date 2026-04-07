@@ -17,10 +17,6 @@ import {
   serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
-/* =========================
-   DOM refs
-========================= */
-
 // Empresa modal
 const openEditCompany = document.getElementById("openEditCompany");
 const editCompanyModal = document.getElementById("editCompanyModal");
@@ -39,13 +35,13 @@ const form = document.getElementById("jobForm");
 const msg = document.getElementById("msg");
 const businessHistoryList = document.getElementById("businessHistoryList");
 
-// Perfil empresa (card)
+// Perfil empresa 
 const bCompanyName = document.getElementById("bCompanyName");
 const bCompanyType = document.getElementById("bCompanyType");
 const bCompanyLocation = document.getElementById("bCompanyLocation");
 const bRating = document.getElementById("bRating");
 
-// Edit empresa (modal)
+// Edit empresa 
 const businessProfileForm = document.getElementById("businessProfileForm");
 const editCompanyName = document.getElementById("editCompanyName");
 const editCompanyType = document.getElementById("editCompanyType");
@@ -56,20 +52,19 @@ const businessProfileMsg = document.getElementById("businessProfileMsg");
 // Listas
 const workersList = document.getElementById("workersList");
 const myJobsList = document.getElementById("myJobsList");
+const contactsList = document.getElementById("contactsList");
+
 
 /* =========================
-   State
+  State
 ========================= */
 let businessUid = null;
+let myContactWorkerIds = new Set();
 
 // modal postulados
 let currentJobId = null;
 let appsUnsub = null; // para cortar snapshot del modal
-let reqUnsubs = [];   // ✅ para cortar snapshots de contact_requests dentro del modal
-
-/* =========================
-   Modals helpers
-========================= */
+let reqUnsubs = [];   // para cortar snapshots de contact_requests dentro del modal
 
 // modal editar empresa
 function openCompanyModal() {
@@ -95,13 +90,13 @@ function closeAppsModalFn() {
   appsModalList.innerHTML = "";
   currentJobId = null;
 
-  // ✅ cortar snapshot de applications
+  //  cortar snapshot de applications
   if (appsUnsub) {
     appsUnsub();
     appsUnsub = null;
   }
 
-  // ✅ cortar snapshots de contact_requests (para que no se acumulen)
+  //  cortar snapshots de contact_requests
   reqUnsubs.forEach((fn) => {
     try { fn(); } catch {}
   });
@@ -149,7 +144,58 @@ function renderMyJobs(jobs) {
     myJobsList.appendChild(el);
   });
 }
+function renderWorkers(workers) {
+  workersList.innerHTML = "";
 
+  if (!workers.length) {
+    workersList.innerHTML = `<div class="meta">No hay trabajadores disponibles ahora.</div>`;
+    return;
+  }
+
+  workers.forEach((w) => {
+    const photo = w.photoUrl && w.photoUrl.trim() ? w.photoUrl : "icons/default-user.png";
+    const daysText = w.availableDays?.length ? `📅 ${w.availableDays.join(", ")}` : "";
+    const hoursText = w.availableHours ? `⏰ ${w.availableHours}` : "";
+    const bioText = w.bio ? `📝 ${w.bio}` : "";
+    const locationText = w.location ? `📍 ${w.location}` : "";
+
+    const workerId = w.uid || w.id;
+
+    const el = document.createElement("div");
+    el.className = "item";
+    el.innerHTML = `
+      <div class="worker-card">
+        <div class="worker-top">
+          <img class="worker-photo" src="${photo}" alt="${w.name || "Trabajador"}" />
+
+          <div class="worker-actions">
+            ${
+              myContactWorkerIds.has(workerId)
+                ? `<button class="btn" disabled>Ya es contacto</button>`
+                : `<button class="btn primary reqContactWorkerBtn" data-workeruid="${workerId}" disabled>
+                    Solicitar contacto
+                  </button>`
+            }
+          </div>
+        </div>
+
+        <div class="worker-info">
+          <div class="title">${w.name || "Trabajador"}</div>
+          ${locationText ? `<div class="sub">${locationText}</div>` : ""}
+          ${bioText ? `<div class="sub">${bioText}</div>` : ""}
+          ${daysText ? `<div class="sub">${daysText}</div>` : ""}
+          ${hoursText ? `<div class="sub">${hoursText}</div>` : ""}
+        </div>
+      </div>
+    `;
+
+    workersList.appendChild(el);
+  });
+
+  workersList.querySelectorAll(".reqContactWorkerBtn").forEach((b) => {
+    b.disabled = false;
+  });
+}
 /* =========================
    Workers disponibles
 ========================= */
@@ -160,38 +206,8 @@ const qWorkers = query(
 );
 
 onSnapshot(qWorkers, (snap) => {
-  const workers = snap.docs.map((d) => d.data());
-
-  workersList.innerHTML = "";
-  if (!workers.length) {
-    workersList.innerHTML = `<div class="meta">No hay trabajadores disponibles ahora.</div>`;
-    return;
-  }
-
-  workers.forEach((w) => {
-    const el = document.createElement("div");
-    el.className = "item";
-    el.innerHTML = `
-      <div class="row" style="gap:12px; align-items:flex-start;">
-        <img src="${w.photoUrl || "https://via.placeholder.com/64?text=AD"}"
-          style="width:52px;height:52px;border-radius:14px;border:1px solid rgba(255,255,255,0.10);object-fit:cover;background: rgba(255,255,255,0.04);" />
-        <div style="flex:1;">
-          <div class="title">${w.name || "Trabajador"}</div>
-          <div class="sub">${w.location ? `📍 ${w.location}` : ""}</div>
-          <div class="sub">${w.bio ? `📝 ${w.bio}` : ""}</div>
-          <div class="sub">${w.availableDays?.length ? `📅 ${w.availableDays.join(", ")}` : ""}</div>
-          <div class="sub">${w.availableHours ? `⏰ ${w.availableHours}` : ""}</div>
-        </div>
-
-        <div class="row" style="gap:10px;">
-        <button class="btn primary reqContactWorkerBtn" data-workeruid="${w.uid}" disabled>
-            Solicitar contacto
-        </button>
-        </div>
-      </div>
-    `;
-    workersList.appendChild(el);
-  });
+  const workers = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
+  renderWorkers(workers);
 });
 
 /* =========================
@@ -220,6 +236,90 @@ onAuthStateChanged(auth, async (user) => {
   editCompanyBio.value = profile.companyBio || "";
 
   who.textContent = `Panel Negocio`;
+
+
+  // Contactos compartidos con este negocio
+const qContacts = query(
+  collection(db, "contact_requests"),
+  where("businessUid", "==", businessUid),
+  where("status", "==", "shared")
+);
+
+onSnapshot(qContacts, async (snapC) => {
+  myContactWorkerIds = new Set();
+  if (contactsList) contactsList.innerHTML = "";
+
+if (snapC.empty) {
+  if (contactsList) {
+    contactsList.innerHTML = `<div class="meta">Todavía no tenés contactos compartidos.</div>`;
+  }
+
+  const workersSnapshot = await getDocs(qWorkers);
+  const workers = workersSnapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+  renderWorkers(workers);
+  return;
+}
+
+  for (const d of snapC.docs) {
+    const cReq = d.data();
+    const workerId = cReq.workerUid;
+    if (!workerId) continue;
+
+    myContactWorkerIds.add(workerId);
+
+    const wSnap = await getDoc(doc(db, "users", workerId));
+    const w = wSnap.exists() ? wSnap.data() : {};
+
+    const photo = w.photoUrl && w.photoUrl.trim()
+      ? w.photoUrl
+      : "icons/default-user.png";
+
+    const isAvailable = !!w.availableNow;
+    const availabilityHtml = isAvailable
+      ? `<span class="badge on">Disponible</span>`
+      : `<span class="badge off">No disponible</span>`;
+
+    const contact = cReq.contact || {};
+
+    const el = document.createElement("div");
+    el.className = "item";
+el.innerHTML = `
+  <div class="row" style="gap:12px; align-items:flex-start;">
+    <img src="${photo}"
+        style="width:52px;height:52px;border-radius:14px;object-fit:cover;border:1px solid rgba(255,255,255,0.10);background: rgba(255,255,255,0.04);" />
+
+    <div style="flex:1;">
+      <div class="row" style="justify-content:space-between; align-items:center; gap:10px;">
+        <div class="title">${w.name || "Trabajador"}</div>
+        ${availabilityHtml}
+      </div>
+
+      ${w.location ? `<div class="sub">📍 ${w.location}</div>` : ""}
+      ${w.bio ? `<div class="sub">📝 ${w.bio}</div>` : ""}
+      ${w.availableDays?.length ? `<div class="sub">📅 ${w.availableDays.join(", ")}</div>` : ""}
+      ${w.availableHours ? `<div class="sub">⏰ ${w.availableHours}</div>` : ""}
+
+      ${contact.whatsapp ? `<div class="sub">🟢 WhatsApp: <b>${contact.whatsapp}</b></div>` : ""}
+      ${contact.phone ? `<div class="sub">📞 Teléfono: <b>${contact.phone}</b></div>` : ""}
+      ${contact.email ? `<div class="sub">✉️ Email: <b>${contact.email}</b></div>` : ""}
+
+      <div class="row" style="margin-top:10px; gap:10px;">
+        <button class="btn danger deleteContactBtn" data-id="${d.id}">
+          Eliminar contacto
+        </button>
+      </div>
+    </div>
+  </div>
+`;
+
+    if (contactsList) contactsList.appendChild(el);
+  }
+
+// Re-render para que en "Trabajadores disponibles" cambie a "Ya es contacto"
+const workersSnapshot = await getDocs(qWorkers);
+const workers = workersSnapshot.docs.map((d) => ({ id: d.id, ...d.data() }));
+renderWorkers(workers);
+});
 
   // Mis jobs del negocio
   const qJobs = query(
@@ -256,7 +356,7 @@ onAuthStateChanged(auth, async (user) => {
       el.innerHTML = `
         <div class="title">${(h.role || "Turno").toUpperCase()} · ${h.zone || ""}</div>
         <div class="sub">📅 ${h.date || ""} · 🕒 ${h.from || ""}–${h.to || ""} · 💶 €${h.pay ?? ""}/h</div>
-        <div class="sub">👤 Worker: ${h.workerUid || ""}</div>
+        ${h.workerName ? `<div class="sub">👤 ${h.workerName}</div>` : ""}
       `;
       businessHistoryList.appendChild(el);
     });
@@ -264,7 +364,7 @@ onAuthStateChanged(auth, async (user) => {
 });
 
 /* =========================
-   Logout
+    Logout
 ========================= */
 logoutBtn.addEventListener("click", async () => {
   await signOut(auth);
@@ -334,7 +434,7 @@ businessProfileForm.addEventListener("submit", async (e) => {
 });
 
 /* =========================
-   Clicks en Mis turnos (Postulados / Cerrar / Eliminar)
+    Clicks en Mis turnos (Postulados / Cerrar / Eliminar)
 ========================= */
 myJobsList.addEventListener("click", async (e) => {
   const btn = e.target.closest("button[data-action]");
@@ -414,7 +514,6 @@ myJobsList.addEventListener("click", async (e) => {
 
         appsModalList.appendChild(row);
 
-        // ✅ acá pintamos contacto EN VIVO
         const contactBox = row.querySelector(".contactBox");
         const actionsRow = row.querySelector(".actionsRow");
 
@@ -440,7 +539,7 @@ myJobsList.addEventListener("click", async (e) => {
 
           if (contactBox) contactBox.innerHTML = contactHTML;
 
-          // ✅ si ya hay request creado, NO mostramos "Aceptar" (evita confusión)
+          // si ya hay request creado, NO mostramos "Aceptar"
           if (status === "pending" || status === "shared" || status === "declined") {
             const acceptBtn = actionsRow?.querySelector(".acceptBtn");
             if (acceptBtn) acceptBtn.remove();
@@ -472,7 +571,7 @@ myJobsList.addEventListener("click", async (e) => {
 });
 
 /* =========================
-   Aceptar postulante (delegado en modal)
+    Aceptar postulante 
 ========================= */
 appsModalList.addEventListener("click", async (e) => {
   const btn = e.target.closest(".acceptBtn");
@@ -493,16 +592,19 @@ appsModalList.addEventListener("click", async (e) => {
       filledAt: serverTimestamp(),
     });
 
-    // 2) Marcar applications: accepted / rejected
-    const qAll = query(collection(db, "applications"), where("jobId", "==", jobId));
-    const allSnap = await getDocs(qAll);
+      // 2) Marcar SOLO la postulación elegida como accepted
+      const qAll = query(collection(db, "applications"), where("jobId", "==", jobId));
+      const allSnap = await getDocs(qAll);
 
-    for (const a of allSnap.docs) {
-      const data = a.data();
-      await updateDoc(doc(db, "applications", a.id), {
-        status: data.workerUid === workerUid ? "accepted" : "rejected",
-      });
-    }
+      for (const a of allSnap.docs) {
+        const data = a.data();
+      
+        if (data.workerUid === workerUid) {
+          await updateDoc(doc(db, "applications", a.id), {
+            status: "accepted",
+          });
+        }
+      }
 
     // 3) Crear solicitud de contacto
     const requestId = `${jobId}_${workerUid}`;
@@ -516,21 +618,25 @@ appsModalList.addEventListener("click", async (e) => {
     });
 
     // 4) Guardar en historial de empresa
-    const jobSnap2 = await getDoc(doc(db, "jobs", jobId));
-    const jobData2 = jobSnap2.exists() ? jobSnap2.data() : {};
+const jobSnap2 = await getDoc(doc(db, "jobs", jobId));
+const jobData2 = jobSnap2.exists() ? jobSnap2.data() : {};
 
-    await setDoc(doc(db, "business_history", requestId), {
-      businessUid,
-      jobId,
-      workerUid,
-      createdAt: serverTimestamp(),
-      role: jobData2.role || "",
-      date: jobData2.date || "",
-      from: jobData2.from || "",
-      to: jobData2.to || "",
-      pay: jobData2.pay ?? null,
-      zone: jobData2.zone || "",
-    });
+const workerSnap = await getDoc(doc(db, "users", workerUid));
+const workerData = workerSnap.exists() ? workerSnap.data() : {};
+
+await setDoc(doc(db, "business_history", requestId), {
+  businessUid,
+  jobId,
+  workerUid,
+  workerName: workerData.name || "Trabajador",
+  createdAt: serverTimestamp(),
+  role: jobData2.role || "",
+  date: jobData2.date || "",
+  from: jobData2.from || "",
+  to: jobData2.to || "",
+  pay: jobData2.pay ?? null,
+  zone: jobData2.zone || "",
+});
 
     btn.textContent = "Aceptado ✅";
     btn.remove(); // ✅ para que no aparezca más
@@ -543,41 +649,74 @@ appsModalList.addEventListener("click", async (e) => {
 });
 
 /* =========================
-   Solicitar contacto directo desde "Trabajadores disponibles"
+    Solicitar contacto directo desde "Trabajadores disponibles"
 ========================= */
 workersList.addEventListener("click", async (e) => {
   const btn = e.target.closest(".reqContactWorkerBtn");
   if (!btn) return;
 
-  const workerUid = btn.dataset.workeruid;
-  const businessUidNow = auth.currentUser?.uid; // ✅ el UID real en ese instante
+  const workerUid = btn.dataset.workeruid?.trim();
+  const businessUidNow = auth.currentUser?.uid;
 
-  if (!workerUid) return alert("No encontré el workerUid del botón.");
-  if (!businessUidNow) return alert("Todavía no cargó tu sesión. Esperá 2 segundos y probá de nuevo.");
+  if (!workerUid) {
+    alert("No encontré el workerUid del botón.");
+    return;
+  }
+
+  if (!businessUidNow) {
+    alert("Todavía no cargó tu sesión. Esperá 2 segundos y probá de nuevo.");
+    return;
+  }
 
   btn.disabled = true;
   const prevText = btn.textContent;
   btn.textContent = "Enviando...";
 
   try {
-    // requestId único (sin job)
     const requestId = `direct_${businessUidNow}_${workerUid}`;
 
-    await setDoc(doc(db, "contact_requests", requestId), {
-      jobId: null,
-      businessUid: businessUidNow, // ✅ seguro
-      workerUid,
-      status: "pending",
-      createdAt: serverTimestamp(),
-      type: "direct",
-    });
+await setDoc(doc(db, "contact_requests", requestId), {
+  jobId: null,
+  businessUid: businessUidNow,
+  workerUid,
+  status: "pending",
+  createdAt: serverTimestamp(),
+  type: "direct",
+});
+
+console.log("Solicitud directa creada:", {
+  requestId,
+  businessUid: businessUidNow,
+  workerUid,
+});
 
     btn.textContent = "Solicitud enviada ✅";
   } catch (err) {
     console.error(err);
     btn.disabled = false;
     btn.textContent = prevText || "Solicitar contacto";
-    alert(err.message);
+    alert(err.message || "No se pudo enviar la solicitud.");
   }
 });
 
+contactsList?.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".deleteContactBtn");
+  if (!btn) return;
+
+  const id = btn.dataset.id;
+  if (!id) return;
+
+  if (!confirm("¿Eliminar este contacto?")) return;
+
+  btn.disabled = true;
+  btn.textContent = "Eliminando...";
+
+  try {
+    await deleteDoc(doc(db, "contact_requests", id));
+  } catch (err) {
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = "Eliminar contacto";
+    alert(err.message);
+  }
+});
