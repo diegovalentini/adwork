@@ -246,12 +246,13 @@ label{
 
 .item .title{ 
   font-weight: 800;
+  margin-bottom: 8px;
 }
 .item .sub{ 
   color: var(--muted);
   font-size: 13px;
-  margin-top: 6px;
-  line-height: 1.4;
+  margin-top: 4px;
+  line-height: 1.45;
 }
 
 /* Overlay modal */

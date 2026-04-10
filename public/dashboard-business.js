@@ -115,6 +115,21 @@ document.addEventListener("keydown", (e) => {
   }
 });
 
+function formatDateEU(dateStr) {
+  if (!dateStr) return "";
+  const parts = dateStr.split("-");
+  if (parts.length !== 3) return dateStr;
+
+  const [year, month, day] = parts;
+  return `${day}/${month}/${year}`;
+}
+
+function formatHourRange(from, to) {
+  if (!from && !to) return "";
+  return `${from || ""} - ${to || ""}`;
+}
+
+
 /* =========================
    Render
 ========================= */
@@ -129,18 +144,20 @@ function renderMyJobs(jobs) {
   jobs.forEach((j) => {
     const el = document.createElement("div");
     el.className = "item";
-    el.innerHTML = `
-      <div class="title">${(j.role || "Turno").toUpperCase()} · ${j.zone || ""}</div>
-      <div class="sub">📅 ${j.date || ""} · 🕒 ${j.from || ""}–${j.to || ""} · 💶 €${j.pay ?? ""}/h</div>
-      <div class="sub">Estado: ${j.status || "open"}</div>
-      ${j.notes ? `<div class="sub">📝 ${j.notes}</div>` : ""}
-
-      <div class="row" style="margin-top:10px; gap:10px;">
-        <button class="btn primary" data-action="apps" data-id="${j.id}">Postulados</button>
-        <button class="btn" data-action="close" data-id="${j.id}">Cerrar</button>
-        <button class="btn danger" data-action="delete" data-id="${j.id}">Eliminar</button>
-      </div>
-    `;
+      el.innerHTML = `
+        <div class="title">${(j.role || "Turno").toUpperCase()} - ${(j.zone || "").toUpperCase()}</div>
+        <div class="sub">📅 ${formatDateEU(j.date)}</div>
+        <div class="sub">🕒 ${formatHourRange(j.from, j.to)}</div>
+        <div class="sub">💶 €${j.pay ?? ""}/h</div>
+        <div class="sub">Estado: ${j.status || "open"}</div>
+        ${j.notes ? `<div class="sub">📝 ${j.notes}</div>` : ""}
+        
+        <div class="row" style="margin-top:10px; gap:10px;">
+          <button class="btn primary" data-action="apps" data-id="${j.id}">Postulados</button>
+          <button class="btn" data-action="close" data-id="${j.id}">Cerrar</button>
+          <button class="btn danger" data-action="delete" data-id="${j.id}">Eliminar</button>
+        </div>
+      `;
     myJobsList.appendChild(el);
   });
 }
@@ -363,6 +380,21 @@ renderWorkers(workers);
   });
 });
 
+const roleSelect = document.getElementById("role");
+const otherRoleContainer = document.getElementById("otherRoleContainer");
+const otherRoleInput = document.getElementById("otherRole");
+
+if (roleSelect && otherRoleContainer) {
+  roleSelect.addEventListener("change", () => {
+    if (roleSelect.value === "otros") {
+      otherRoleContainer.style.display = "block";
+    } else {
+      otherRoleContainer.style.display = "none";
+      if (otherRoleInput) otherRoleInput.value = "";
+    }
+  });
+}
+
 /* =========================
     Logout
 ========================= */
@@ -380,9 +412,22 @@ form.addEventListener("submit", async (e) => {
 
   msg.textContent = "Publicando...";
 
+  let roleValue = document.getElementById("role").value;
+
+  if (roleValue === "otros") {
+    const other = document.getElementById("otherRole").value.trim();
+
+    if (!other) {
+      msg.textContent = "Especificá el puesto.";
+      return;
+    }
+
+    roleValue = other;
+  }
+
   const data = {
     businessUid,
-    role: document.getElementById("role").value,
+    role: roleValue,
     date: document.getElementById("date").value,
     from: document.getElementById("from").value,
     to: document.getElementById("to").value,
@@ -397,6 +442,9 @@ form.addEventListener("submit", async (e) => {
     await addDoc(collection(db, "jobs"), data);
     msg.textContent = "Turno publicado ✅";
     form.reset();
+
+    const otherRoleContainer = document.getElementById("otherRoleContainer");
+    if (otherRoleContainer) otherRoleContainer.style.display = "none";
   } catch (err) {
     msg.textContent = err.message;
   }

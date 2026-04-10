@@ -109,6 +109,21 @@ const profileMsg = $("profileMsg");
 // Días (checkboxes) - ojo: si el modal no existe, esto puede venir vacío y no rompe
 const dayChks = Array.from(document.querySelectorAll(".dayChk"));
 
+function formatDateEU(dateStr) {
+  if (!dateStr) return "";
+  const parts = dateStr.split("-");
+  if (parts.length !== 3) return dateStr;
+
+  const [year, month, day] = parts;
+  return `${day}/${month}/${year}`;
+}
+
+function formatHourRange(from, to) {
+  if (!from && !to) return "";
+  return `${from || ""} - ${to || ""}`;
+}
+
+
 
 //Funciones contacto
 function openShareModal(reqId) {
@@ -198,14 +213,16 @@ function renderAvailableJobs(jobs) {
   available.forEach((j) => {
     const el = document.createElement("div");
     el.className = "item";
-    el.innerHTML = `
-      <div class="title">${(j.role || "Turno").toUpperCase()} · ${j.zone || ""}</div>
-      <div class="sub">📅 ${j.date || ""} · 🕒 ${j.from || ""}–${j.to || ""} · 💶 €${j.pay ?? ""}/h</div>
-      ${j.notes ? `<div class="sub">📝 ${j.notes}</div>` : ""}
-      <div class="row" style="margin-top:10px;">
-        <button class="btn primary applyBtn" data-jobid="${j.id}">Postularme</button>
-      </div>
-    `;
+          el.innerHTML = `
+          <div class="title">${(j.role || "Turno").toUpperCase()} - ${(j.zone || "").toUpperCase()}</div>
+          <div class="sub">📅 ${formatDateEU(j.date)}</div>
+          <div class="sub">🕒 ${formatHourRange(j.from, j.to)}</div>
+          <div class="sub">💶 €${j.pay ?? ""}/h</div>
+          ${j.notes ? `<div class="sub">📝 ${j.notes}</div>` : ""}
+          <div class="row" style="margin-top:10px;">
+            <button class="btn primary applyBtn" data-jobid="${j.id}">Postularme</button>
+          </div>
+        `;
     jobsList.appendChild(el);
   });
 }
@@ -224,15 +241,17 @@ function renderMyApplications(jobs) {
   mine.forEach((j) => {
     const el = document.createElement("div");
     el.className = "item";
-    el.innerHTML = `
-      <div class="title">${(j.role || "Turno").toUpperCase()} · ${j.zone || ""}</div>
-      <div class="sub">📅 ${j.date || ""} · 🕒 ${j.from || ""}–${j.to || ""} · 💶 €${j.pay ?? ""}/h</div>
-      ${j.notes ? `<div class="sub">📝 ${j.notes}</div>` : ""}
-      <div class="row" style="margin-top:10px; gap:10px;">
-        <button class="btn danger withdrawBtn" data-jobid="${j.id}">Despostularme</button>
-        <span class="badge on">Postulado ✅</span>
-      </div>
-    `;
+        el.innerHTML = `
+          <div class="title">${(j.role || "Turno").toUpperCase()} - ${(j.zone || "").toUpperCase()}</div>
+          <div class="sub">📅 ${formatDateEU(j.date)}</div>
+          <div class="sub">🕒 ${formatHourRange(j.from, j.to)}</div>
+          <div class="sub">💶 €${j.pay ?? ""}/h</div>
+          ${j.notes ? `<div class="sub">📝 ${j.notes}</div>` : ""}
+          <div class="row" style="margin-top:10px; gap:10px;">
+            <button class="btn danger withdrawBtn" data-jobid="${j.id}">Despostularme</button>
+            <span class="badge on">Postulado ✅</span>
+          </div>
+        `;
     myAppsList.appendChild(el);
   });
 }
@@ -456,8 +475,9 @@ for (const d of snap.docs) {
     if (job) {
       jobText = `
         <div class="sub">Quiere tu contacto para este turno:</div>
-        <div class="sub">📅 ${job.date || ""} · 🕒 ${job.from || ""}-${job.to || ""}</div>
-        <div class="sub">💼 ${(job.role || "Turno").toUpperCase()} · 📍 ${job.zone || ""}</div>
+        <div class="sub">📅 ${formatDateEU(job.date)}</div>
+        <div class="sub">🕒 ${formatHourRange(job.from, job.to)}</div>
+        <div class="sub">💼 ${(job.role || "Turno").toUpperCase()} - ${(job.zone || "").toUpperCase()}</div>
       `;
     }
   }
