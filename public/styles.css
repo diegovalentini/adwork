@@ -227,3 +227,43 @@ label input[type="checkbox"] {
 .legal-back a:hover{
   text-decoration: underline;
 }
+
+.lang-switcher{
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 20;
+}
+
+.lang-btn{
+  border: 1px solid var(--border);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  border-radius: 12px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-weight: 700;
+}
+
+.lang-menu{
+  margin-top: 8px;
+  background: rgba(15,26,47,0.95);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 130px;
+}
+
+.lang-option{
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  padding: 10px 12px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.lang-option:hover{
+  background: rgba(255,255,255,0.05);
+}
