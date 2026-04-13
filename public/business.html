@@ -3,161 +3,186 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>AdWork - Negocio</title>
+  <title>AdWork - Negoci</title>
   <link rel="stylesheet" href="dashboard.css" />
 </head>
 <body>
   <div class="container">
     <div class="topbar">
-      <div>
+      <div class="topbar-header">
         <div class="brand">AdWork</div>
-        <div id="who" class="meta">Cargando...</div>
+        <div id="who" class="meta" data-i18n="loading">Carregant...</div>
       </div>
-      <div class="row">
-        <button id="logoutBtn" class="btn danger">Salir</button>
+      <div class="topbar-sub">
+
+        <!-- Selector de idioma -->
+        <div class="lang-switcher" style="position:relative;">
+          <button type="button" id="langToggle" class="lang-btn">
+            <span id="currentLang">CA</span> ▾
+          </button>
+          <div id="langMenu" class="lang-menu hidden">
+            <button type="button" class="lang-option" data-lang="ca">Català</button>
+            <button type="button" class="lang-option" data-lang="es">Español</button>
+          </div>
+        </div>
+
+        <button id="logoutBtn" class="btn danger" data-i18n="logout">Sortir</button>
       </div>
     </div>
-<section class="card">
-  <div class="row" style="justify-content:space-between; margin-bottom:12px;">
-    <h3 style="margin:0;">Mi empresa</h3>
-    <button id="openEditCompany" class="btn primary">Editar</button>
-  </div>
 
-  <div class="item">
-    <div class="title" id="bCompanyName">—</div>
-    <div class="sub" id="bCompanyType">—</div>
-    <div class="sub" id="bCompanyLocation">—</div>
-    <div class="sub" id="bRating">—</div>
-  </div>
-</section>
+    <section class="card">
+      <div class="row" style="justify-content:space-between; margin-bottom:12px;">
+        <h3 style="margin:0;" data-i18n="my_company">La meva empresa</h3>
+        <button id="openEditCompany" class="btn primary" data-i18n="edit">Editar</button>
+      </div>
+      <div class="item">
+        <div class="title" id="bCompanyName">—</div>
+        <div class="sub" id="bCompanyType">—</div>
+        <div class="sub" id="bCompanyLocation">—</div>
+        <div class="sub" id="bRating">—</div>
+      </div>
+    </section>
+
     <div class="grid">
       <section class="card">
-        <h3>Publicar turno</h3>
+        <h3 data-i18n="publish_shift">Publicar torn</h3>
         <form id="jobForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
-          <label>Puesto
+
+          <label>
+            <span data-i18n="label_position">Lloc</span>
             <select id="role" required>
-              <option value="camarero">Camarero</option>
-              <option value="cocina">Cocina</option>
-              <option value="limpieza">Limpieza</option>
-              <option value="recepcion">Recepción</option>
-              <option value="pica">Pica</option>
-              <option value="otros">Otros</option>
+              <option value="camarero" data-i18n="pos_waiter">Cambrer</option>
+              <option value="cocina" data-i18n="pos_kitchen">Cuina</option>
+              <option value="limpieza" data-i18n="pos_cleaning">Neteja</option>
+              <option value="recepcion" data-i18n="pos_reception">Recepció</option>
+              <option value="pica" data-i18n="pos_pica">Pica</option>
+              <option value="otros" data-i18n="pos_other">Altres</option>
             </select>
           </label>
+
           <div id="otherRoleContainer" style="display:none;">
-            <label>Especificar puesto
-              <input id="otherRole" type="text" placeholder="Ej: Bartender, DJ..." />
+            <label>
+              <span data-i18n="specify_position">Especificar lloc</span>
+              <input id="otherRole" type="text" placeholder="Ex: Bartender, DJ..." />
             </label>
           </div>
-          <label>Fecha
-            <input id="date" type="date" required/>
+
+          <label>
+            <span data-i18n="label_date">Data</span>
+            <input id="date" type="date" required />
           </label>
 
           <div class="row" style="gap:12px;">
-            <label style="flex:1;">Desde
+            <label style="flex:1;">
+              <span data-i18n="label_from">Des de</span>
               <input id="from" type="time" required />
             </label>
-            <label style="flex:1;">Hasta
+            <label style="flex:1;">
+              <span data-i18n="label_to">Fins</span>
               <input id="to" type="time" required />
             </label>
           </div>
 
-          <label>Pago (€ / hora)
+          <label>
+            <span data-i18n="label_pay">Pagament (€ / hora)</span>
             <input id="pay" type="number" min="0" step="0.5" required />
           </label>
 
-          <label>Zona (ej: Escaldes)
+          <label>
+            <span data-i18n="label_zone">Zona (ex: Escaldes)</span>
             <input id="zone" type="text" required />
           </label>
 
-          <label>Notas (opcional)
-            <textarea id="notes" placeholder="Uniforme, experiencia, idioma..."></textarea>
+          <label>
+            <span data-i18n="label_notes">Notes (opcional)</span>
+            <textarea id="notes" placeholder="Uniforme, experiència, idioma..."></textarea>
           </label>
 
-          <button class="btn primary" type="submit">📢 Publicar</button>
+          <button class="btn primary" type="submit" data-i18n="btn_publish">📢 Publicar</button>
           <div id="msg" class="meta"></div>
         </form>
       </section>
 
       <section class="card">
-          <h3>Mis turnos publicados</h3>
-          <div class="list" id="myJobsList"></div>
+        <h3 data-i18n="my_published_shifts">Els meus torns publicats</h3>
+        <div class="list" id="myJobsList"></div>
       </section>
 
       <section class="card">
-          <h3>Historial</h3>
-          <div class="list" id="businessHistoryList"></div>
+        <h3 data-i18n="history">Historial</h3>
+        <div class="list" id="businessHistoryList"></div>
       </section>
 
       <section class="card">
-        <h3>Trabajadores disponibles </h3>
+        <h3 data-i18n="available_workers">Treballadors disponibles</h3>
         <div class="list" id="workersList"></div>
       </section>
 
       <section class="card">
-        <h3>Contactos</h3>
+        <h3 data-i18n="contacts">Contactes</h3>
         <div class="list" id="contactsList"></div>
       </section>
-      
     </div>
   </div>
+
   <!-- Modal Editar Empresa -->
-<div id="editCompanyModal" class="modalOverlay hidden">
-  <div class="card modalCard">
-    <div class="modalHeader">
-      <h3>Editar empresa</h3>
-      <button id="closeEditCompany" class="btn">✕</button>
+  <div id="editCompanyModal" class="modalOverlay hidden">
+    <div class="card modalCard">
+      <div class="modalHeader">
+        <h3 data-i18n="edit_company">Editar empresa</h3>
+        <button id="closeEditCompany" class="btn">✕</button>
+      </div>
+      <form id="businessProfileForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
+        <label>
+          <span data-i18n="label_company_name">Nom de l'empresa</span>
+          <input id="editCompanyName" type="text" />
+        </label>
+        <label>
+          <span data-i18n="label_sector">Sector</span>
+          <select id="editCompanyType">
+            <option value="hotel" data-i18n="sector_hotel">Hotel</option>
+            <option value="restaurante" data-i18n="sector_restaurant">Restaurant</option>
+            <option value="comercio" data-i18n="sector_shop">Comerç</option>
+            <option value="otros" data-i18n="sector_other">Altres</option>
+          </select>
+        </label>
+        <label>
+          <span data-i18n="label_location">Ubicació</span>
+          <input id="editCompanyLocation" type="text" />
+        </label>
+        <label>
+          <span data-i18n="label_description">Descripció (opcional)</span>
+          <textarea id="editCompanyBio" placeholder="Ex: Hotel 4* al centre..."></textarea>
+        </label>
+        <button class="btn primary" type="submit" data-i18n="btn_save">Desar</button>
+        <div id="businessProfileMsg" class="meta"></div>
+      </form>
     </div>
-
-    <form id="businessProfileForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
-      <label>Nombre de empresa
-        <input id="editCompanyName" type="text" />
-      </label>
-
-      <label>Rubro
-        <select id="editCompanyType">
-          <option value="hotel">Hotel</option>
-          <option value="restaurante">Restaurante</option>
-          <option value="comercio">Comercio</option>
-          <option value="otros">Otros</option>
-        </select>
-      </label>
-
-      <label>Locación
-        <input id="editCompanyLocation" type="text" />
-      </label>
-
-      <label>Descripción (opcional)
-        <textarea id="editCompanyBio" placeholder="Ej: Hotel 4* en el centro..."></textarea>
-      </label>
-
-      <button class="btn primary" type="submit">Guardar</button>
-      <div id="businessProfileMsg" class="meta"></div>
-    </form>
   </div>
-</div>
-<!-- Modal Postulados -->
-<div id="appsModal" class="modalOverlay hidden">
-  <div class="card modalCard">
-    <div class="modalHeader">
-      <h3 id="appsModalTitle">Postulados</h3>
-      <button id="closeAppsModal" class="btn">✕</button>
+
+  <!-- Modal Postulados -->
+  <div id="appsModal" class="modalOverlay hidden">
+    <div class="card modalCard">
+      <div class="modalHeader">
+        <h3 id="appsModalTitle" data-i18n="applicants_title">Postulats</h3>
+        <button id="closeAppsModal" class="btn">✕</button>
+      </div>
+      <div class="meta" id="appsModalSub" data-i18n="applicants_loading">Carregant...</div>
+      <div class="list" id="appsModalList" style="margin-top:12px;"></div>
     </div>
-
-    <div class="meta" id="appsModalSub">Cargando...</div>
-    <div class="list" id="appsModalList" style="margin-top:12px;"></div>
   </div>
-</div>
+
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dashboard-business.js"></script>
-<footer class="footer">
-  <div style="margin-bottom:6px;">
-    <a href="terms.html">Términos</a> · 
-    <a href="privacy.html">Privacidad</a>
-  </div>
-  <div>
-    © 2026 AdWork · contacto: adwork.contacto@gmail.com
-  </div>
-</footer>
+
+  <footer class="footer">
+    <div style="margin-bottom:6px;">
+      <a href="terms.html" data-i18n="footer_terms">Termes</a> · 
+      <a href="privacy.html" data-i18n="footer_privacy">Privacitat</a>
+    </div>
+    <div data-i18n="footer_contact">
+      © 2026 AdWork · contacte: adwork.contacto@gmail.com
+    </div>
+  </footer>
 </body>
 </html>
