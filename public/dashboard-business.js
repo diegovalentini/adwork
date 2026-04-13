@@ -54,6 +54,11 @@ const workersList = document.getElementById("workersList");
 const myJobsList = document.getElementById("myJobsList");
 const contactsList = document.getElementById("contactsList");
 
+// Bloquear fechas pasadas en el formulario de turno
+const dateInput = document.getElementById("date");
+if (dateInput) {
+  dateInput.min = new Date().toISOString().split("T")[0];
+}
 
 /* =========================
   State
@@ -372,7 +377,7 @@ renderWorkers(workers);
       el.className = "item";
       el.innerHTML = `
         <div class="title">${(h.role || "Turno").toUpperCase()} · ${h.zone || ""}</div>
-        <div class="sub">📅 ${h.date || ""} · 🕒 ${h.from || ""}–${h.to || ""} · 💶 €${h.pay ?? ""}/h</div>
+        <div class="sub">📅 ${formatDateEU(h.date)} · 🕒 ${h.from || ""}–${h.to || ""} · 💶 €${h.pay ?? ""}/h</div>
         ${h.workerName ? `<div class="sub">👤 ${h.workerName}</div>` : ""}
       `;
       businessHistoryList.appendChild(el);
@@ -425,13 +430,19 @@ form.addEventListener("submit", async (e) => {
     roleValue = other;
   }
 
+  const payValue = Number(document.getElementById("pay").value);
+if (!payValue || payValue <= 0) {
+  msg.textContent = "El pago debe ser mayor a 0.";
+  return;
+}
+
   const data = {
     businessUid,
     role: roleValue,
     date: document.getElementById("date").value,
     from: document.getElementById("from").value,
     to: document.getElementById("to").value,
-    pay: Number(document.getElementById("pay").value),
+    pay: payValue,
     zone: document.getElementById("zone").value.trim(),
     notes: document.getElementById("notes").value.trim(),
     status: "open",
@@ -440,8 +451,9 @@ form.addEventListener("submit", async (e) => {
 
   try {
     await addDoc(collection(db, "jobs"), data);
-    msg.textContent = "Turno publicado ✅";
-    form.reset();
+      msg.textContent = "Turno publicado ✅";
+      setTimeout(() => { msg.textContent = ""; }, 3000);
+      form.reset();
 
     const otherRoleContainer = document.getElementById("otherRoleContainer");
     if (otherRoleContainer) otherRoleContainer.style.display = "none";
@@ -536,8 +548,8 @@ myJobsList.addEventListener("click", async (e) => {
 
         row.innerHTML = `
           <div class="row" style="gap:12px; align-items:flex-start;">
-            <img src="${u.photoUrl || "https://via.placeholder.com/56?text=AD"}"
-                 style="width:56px;height:56px;border-radius:14px;object-fit:cover;border:1px solid rgba(255,255,255,0.10);" />
+            src="${u.photoUrl || "icons/default-user.png"}"
+                style="width:56px;height:56px;border-radius:14px;object-fit:cover;border:1px solid rgba(255,255,255,0.10);" />
 
             <div style="flex:1;">
               <div class="title">${u.name || "Trabajador"}</div>
@@ -730,12 +742,6 @@ await setDoc(doc(db, "contact_requests", requestId), {
   status: "pending",
   createdAt: serverTimestamp(),
   type: "direct",
-});
-
-console.log("Solicitud directa creada:", {
-  requestId,
-  businessUid: businessUidNow,
-  workerUid,
 });
 
     btn.textContent = "Solicitud enviada ✅";

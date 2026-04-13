@@ -26,6 +26,7 @@ body{
   width: min(420px, 92vw);
   margin: auto;
   padding: 28px 0;
+  position: relative;
 }
 body > footer{
   text-align: center;

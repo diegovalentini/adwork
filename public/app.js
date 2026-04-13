@@ -78,7 +78,6 @@ const translations = {
     accept_prefix: "Accepto els",
     accept_and: "i la",
     msg_accept_terms: "Has d’acceptar els termes i condicions.",
-    msg_accept_terms: "Has d’acceptar els termes i condicions.",
     msg_creating_account: "Creant compte...",
     msg_account_created: "Compte creat ✅",
     msg_logging_in: "Entrant...",
@@ -120,7 +119,6 @@ const translations = {
     footer_terms: "Términos",
     footer_privacy: "Privacidad",
     footer_contact: "© 2026 AdWork · contacto: adwork.contacto@gmail.com",
-
     msg_accept_terms: "Debes aceptar los términos y condiciones.",
     msg_creating_account: "Creando cuenta...",
     msg_account_created: "Cuenta creada ✅",
@@ -139,7 +137,6 @@ const translations = {
     msg_logged_out: "Sesión cerrada.",
     accept_prefix: "Acepto los",
     accept_and: "y la",
-    msg_accept_terms: "Debes aceptar los términos y condiciones.",
   }
 };
 
@@ -251,14 +248,13 @@ registerForm.addEventListener("submit", async (e) => {
       email,
       role, 
       createdAt: serverTimestamp(),
-       // solo negocio:
-        companyName: isBusiness ? regCompanyName.value.trim() : null,
-  companyType: isBusiness ? regCompanyType.value : null,
-  companyLocation: isBusiness ? regCompanyLocation.value.trim() : null,
-
-  // ratings
-  ratingAvg: 0,
-  ratingCount: 0,
+      // solo negocio:
+      companyName: isBusiness ? regCompanyName.value.trim() : null,
+      companyType: isBusiness ? regCompanyType.value : null,
+      companyLocation: isBusiness ? regCompanyLocation.value.trim() : null,
+      // ratings
+      ratingAvg: 0,
+      ratingCount: 0,
     });
 
     showMessage(t("msg_account_created"), "success");
@@ -292,7 +288,7 @@ loginForm.addEventListener("submit", async (e) => {
   }
 
   console.error(err);
-  showMessage(t("error"));
+  showMessage(text, "error");
 }
 
 
@@ -321,7 +317,7 @@ resetBtn.addEventListener("click", async () => {
 });
 
 // AUTH STATE
-onAuthStateChanged(auth, async (user) => {
+  onAuthStateChanged(auth, async (user) => {
   const authCard = document.getElementById("authCard");
 
   if (!user) {

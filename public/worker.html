@@ -14,8 +14,20 @@
         </div>
         <div class="topbar-sub">
           <span id="availabilityBadge" class="badge off">🔴 No disponible</span>
-          <button id="toggleAvail" class="btn primary">Cambiar estado</button>
-        
+          <button id="toggleAvail" class="btn primary" data-i18n="worker_toggle_status">Canviar estat</button>
+
+          <!-- Selector de idioma -->
+          <div class="lang-switcher" style="position:relative;">
+            <button type="button" id="langToggle" class="lang-btn">
+              <span id="currentLang">CA</span> ▾
+            </button>
+          
+            <div id="langMenu" class="lang-menu hidden">
+              <button type="button" class="lang-option" data-lang="ca">Català</button>
+              <button type="button" class="lang-option" data-lang="es">Español</button>
+            </div>
+          </div>
+
           <button id="logoutBtn" class="logout-icon-btn" aria-label="Cerrar sesión">
             <img src="icons/salida.png" alt="Cerrar sesión" />
           </button>
@@ -25,8 +37,8 @@
     <div class="grid">
             <section class="card">
   <div class="row" style="justify-content:space-between;">
-    <h3 style="margin:0;">Mi perfil</h3>
-    <button id="openEditProfile" class="btn primary">Editar</button>
+    <h3 style="margin:0;" data-i18n="worker_profile_title">El meu perfil</h3>
+    <button id="openEditProfile" class="btn primary" data-i18n="common_edit">Editar</button>
   </div>
 
   <div class="item" style="margin-top:12px;">
@@ -47,19 +59,19 @@
         </div>
       </section>
       <section class="card">
-  <h3>Solicitudes de contacto</h3>
+  <h3 data-i18n="worker_contact_requests">Sol·licituds de contacte</h3>
   <div class="list" id="contactReqList"></div>
 </section>
       <section class="card">
-        <h3>Turnos disponibles</h3>
+        <h3 data-i18n="worker_available_jobs">Torns disponibles</h3>
         <div class="list" id="jobsList"></div>
       </section>
       <section class="card">
-  <h3>Mis postulaciones</h3>
+  <h3 data-i18n="worker_my_applications">Les meves postulacions</h3>
   <div class="list" id="myAppsList"></div>
       </section>
       <section class="card">
-  <h3>Historial</h3>
+  <h3 data-i18n="common_history">Historial</h3>
   <div class="list" id="workerHistoryList"></div>
       </section>
     </div>
@@ -70,34 +82,40 @@
 <div id="editProfileModal" class="modalOverlay hidden">
   <div class="card modalCard">
     <div class="modalHeader">
-      <h3>Editar perfil</h3>
+      <h3 data-i18n="worker_edit_profile">Editar perfil</h3>
       <button id="closeEditProfile" class="btn">✕</button>
     </div>
     <form id="profileForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
-      <label>Nombre
+      <label>
+        <span data-i18n="worker_name">Nom</span>
         <input id="editName" type="text" />
       </label>
 
-      <label>Locación
+      <label>
+        <span data-i18n="worker_location">Ubicació</span>
         <input id="editLocation" type="text" />
       </label>
 
-      <label>Días disponibles</label>
-      <div class="row" style="gap:10px; flex-wrap:wrap;">
-        <label class="badge"><input type="checkbox" class="dayChk" value="Lun"> Lun</label>
-        <label class="badge"><input type="checkbox" class="dayChk" value="Mar"> Mar</label>
-        <label class="badge"><input type="checkbox" class="dayChk" value="Mié"> Mié</label>
-        <label class="badge"><input type="checkbox" class="dayChk" value="Jue"> Jue</label>
-        <label class="badge"><input type="checkbox" class="dayChk" value="Vie"> Vie</label>
-        <label class="badge"><input type="checkbox" class="dayChk" value="Sáb"> Sáb</label>
-        <label class="badge"><input type="checkbox" class="dayChk" value="Dom"> Dom</label>
-      </div>
-
-      <label>Horario disponible
-        <input id="editHours" type="text" />
+      <label>
+        <span data-i18n="worker_days">Dies disponibles</span>
+        <div class="row" style="flex-wrap:wrap; gap:8px;">
+          <label><input type="checkbox" class="dayChk" value="Lun" /> Dl</label>
+          <label><input type="checkbox" class="dayChk" value="Mar" /> Dm</label>
+          <label><input type="checkbox" class="dayChk" value="Mié" /> Dc</label>
+          <label><input type="checkbox" class="dayChk" value="Jue" /> Dj</label>
+          <label><input type="checkbox" class="dayChk" value="Vie" /> Dv</label>
+          <label><input type="checkbox" class="dayChk" value="Sáb" /> Ds</label>
+          <label><input type="checkbox" class="dayChk" value="Dom" /> Dg</label>
+        </div>
       </label>
 
-      <label>Foto de perfil
+      <label>
+        <span data-i18n="worker_hours">Horari disponible</span>
+        <input id="editHours" type="text" placeholder="16h a 22h" />
+      </label>
+
+      <label>
+        <span data-i18n="worker_photo">Foto de perfil</span>
         <input id="editPhotoFile" type="file" accept="image/*" />
       </label>
 
@@ -105,11 +123,12 @@
         style="width:72px;height:72px;border-radius:16px;object-fit:cover;" />
         <div id="uploadHint" class="meta">Subí una imagen (jpg/png)</div>
 
-      <label>Descripción
+      <label>
+        <span data-i18n="worker_bio">Descripció</span>
         <textarea id="editBio"></textarea>
       </label>
 
-      <button class="btn primary" type="submit">Guardar cambios</button>
+      <button class="btn primary" type="submit" data-i18n="worker_save_changes">Desar canvis</button>
       <div id="profileMsg" class="meta"></div>
     </form>
   </div>
@@ -117,26 +136,32 @@
 <div id="shareContactModal" class="modalOverlay hidden">
   <div class="card modalCard">
     <div class="modalHeader">
-      <h3>Compartir contacto</h3>
+      <h3 data-i18n="worker_share_contact">Compartir contacte</h3>
       <button id="closeShareContact" class="btn">✕</button>
     </div>
 
     <form id="shareContactForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
       <input type="hidden" id="shareReqId" />
 
-      <label>WhatsApp (opcional)
+      <label>
+        <span data-i18n="worker_whatsapp_optional">WhatsApp (opcional)</span>
         <input id="shareWhatsapp" type="text" placeholder="+376..." />
       </label>
 
-      <label>Teléfono (opcional)
-        <input id="sharePhone" type="text" placeholder="+376..." />
+      <label>
+        <span data-i18n="worker_phone_optional">Telèfon (opcional)</span>
+        <input id="sharePhone" type="text" />
       </label>
 
-      <label>Email (opcional)
-        <input id="shareEmail" type="email" placeholder="tu@email.com" />
+
+      <label>
+        <span data-i18n="worker_email_optional">Email (opcional)</span>
+        <input id="shareEmail" type="email" />
       </label>
 
-      <button class="btn primary" type="submit">Compartir</button>
+      <button class="btn primary" type="submit" data-i18n="worker_share">
+        Compartir
+      </button>
       <div id="shareContactMsg" class="meta"></div>
     </form>
   </div>
@@ -146,13 +171,13 @@
   <script type="module" src="dashboard-worker.js"></script>
 
   <footer class="footer">
-  <div style="margin-bottom:6px;">
-    <a href="terms.html">Términos</a> · 
-    <a href="privacy.html">Privacidad</a>
-  </div>
-  <div>
-    © 2026 AdWork · contacto: adwork.contacto@gmail.com
-  </div>
-</footer>
+    <div style="margin-bottom:6px;">
+      <a href="terms.html" data-i18n="footer_terms">Termes</a> · 
+      <a href="privacy.html" data-i18n="footer_privacy">Privacitat</a>
+    </div>
+    <div data-i18n="footer_contact">
+      © 2026 AdWork · contacte: adwork.contacto@gmail.com
+    </div>
+  </footer>
 </body>
 </html>
