@@ -55,6 +55,14 @@ body{
   flex-wrap: wrap;
 
 }
+
+.topbar-brand-group{
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 4px;
+}
+
 /* Boton logout xd */
 .logout-icon-btn{
   width: 40px;

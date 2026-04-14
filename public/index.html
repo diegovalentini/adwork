@@ -12,19 +12,22 @@
   </head>
   <body>
     <main class="container">
-      <div class="lang-switcher">
-        <button type="button" id="langToggle" class="lang-btn">
-          <span id="currentLang">CA</span> ▾
-        </button>
-
-        <div id="langMenu" class="lang-menu hidden">
-          <button type="button" class="lang-option" data-lang="ca">Català</button>
-          <button type="button" class="lang-option" data-lang="es">Español</button>
-        </div>
-      </div>
-
       <header class="header">
-        <div class="logo">AdWork</div>
+        <div class="header-top">
+          <div class="logo">AdWork</div>
+        
+          <div class="lang-switcher">
+            <button type="button" id="langToggle" class="lang-btn">
+              <span id="currentLang">CA</span> ▾
+            </button>
+          
+            <div id="langMenu" class="lang-menu hidden">
+              <button type="button" class="lang-option" data-lang="ca">Català</button>
+              <button type="button" class="lang-option" data-lang="es">Español</button>
+            </div>
+          </div>
+        </div>
+      
         <p class="subtitle" data-i18n="hero_subtitle">Extras i torns per hores a Andorra</p>
       </header>
 
@@ -80,7 +83,7 @@
           
             <div id="businessFields" class="hidden">
               <label>
-                <span data-i18n="label_company_name">de l’empresa</span> 
+                <span data-i18n="label_company_name"> Nom de l’empresa</span> 
                 <input id="regCompanyName" type="text" placeholder="Ex: Hotel Nevada" />
               </label>
             
