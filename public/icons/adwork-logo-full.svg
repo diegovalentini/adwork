@@ -1,0 +1,23 @@
+<svg width="900" height="320" viewBox="0 0 900 320" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="adworkGreen" x1="220" y1="30" x2="380" y2="170" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2BE39A"/>
+      <stop offset="1" stop-color="#14A86F"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Mark -->
+  <g transform="translate(285 28)">
+    <path d="M14 125L86 8C92 0 104 0 110 8L162 90C168 99 161 110 150 110H122C116 110 111 107 108 102L95 82C92 77 85 77 82 82L54 125C51 130 46 133 40 133H26C16 133 9 134 6 131C1 127 7 117 14 125Z" fill="url(#adworkGreen)"/>
+    <rect x="111" y="6" width="36" height="150" rx="18" transform="rotate(-28 111 6)" fill="url(#adworkGreen)"/>
+  </g>
+
+  <!-- Wordmark -->
+  <text x="205" y="230" font-family="Inter, Arial, Helvetica, sans-serif" font-size="74" font-weight="600" fill="#F6F7FB">Ad</text>
+  <text x="307" y="230" font-family="Inter, Arial, Helvetica, sans-serif" font-size="74" font-weight="800" fill="#18C985">Work</text>
+
+  <!-- Tagline -->
+  <text x="450" y="272" text-anchor="middle" font-family="Inter, Arial, Helvetica, sans-serif" font-size="24" letter-spacing="0.8" fill="#93A29C">
+    Trabajos por horas en Andorra
+  </text>
+</svg>

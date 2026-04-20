@@ -1,54 +1,68 @@
 <!doctype html>
-<html lang="es">
+<html lang="ca">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Política de Privacidad - AdWork</title>
+  <title>Política de Privacitat - AdWork</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="legal-page">
-    <div class="legal-card">
-      <h1>Política de Privacidad</h1>
-      <p class="legal-date">Última actualización: 2026</p>
+    <div class="legal-card" style="position:relative;">
 
-      <h2>1. Información que recopilamos</h2>
-      <p>AdWork puede recopilar la siguiente información:</p>
+      <div class="lang-switcher">
+        <button type="button" id="langToggle" class="lang-btn">
+          <span id="currentLang">CA</span> ▾
+        </button>
+
+        <div id="langMenu" class="lang-menu hidden">
+          <button type="button" class="lang-option" data-lang="ca">Català</button>
+          <button type="button" class="lang-option" data-lang="es">Español</button>
+        </div>
+      </div>
+
+      <h1 data-i18n="privacy_title">Política de Privacitat</h1>
+      <p class="legal-date" data-i18n="privacy_date">Última actualització: 2026</p>
+
+      <h2 data-i18n="privacy_1_title">1. Informació que recopilem</h2>
+      <p data-i18n="privacy_1_text">AdWork pot recopilar la següent informació:</p>
       <ul>
-        <li>Nombre</li>
-        <li>Email</li>
-        <li>Información de perfil como ubicación, disponibilidad y descripción</li>
-        <li>Datos necesarios para facilitar el contacto entre trabajadores y negocios dentro de la plataforma</li>
+        <li data-i18n="privacy_1_item_1">Nom</li>
+        <li data-i18n="privacy_1_item_2">Email</li>
+        <li data-i18n="privacy_1_item_3">Informació de perfil com ubicació, disponibilitat i descripció</li>
+        <li data-i18n="privacy_1_item_4">Dades necessàries per facilitar el contacte entre treballadors i negocis dins de la plataforma</li>
       </ul>
 
-      <h2>2. Uso de la información</h2>
-      <p>Los datos recopilados se utilizan para permitir el funcionamiento de la plataforma, facilitar la conexión entre trabajadores y negocios, mejorar la experiencia del usuario y mantener la seguridad básica del servicio.</p>
+      <h2 data-i18n="privacy_2_title">2. Ús de la informació</h2>
+      <p data-i18n="privacy_2_text">Les dades recopilades s'utilitzen per permetre el funcionament de la plataforma, facilitar la connexió entre treballadors i negocis, millorar l'experiència de l'usuari i mantenir la seguretat bàsica del servei.</p>
 
-      <h2>3. Almacenamiento de datos</h2>
-      <p>La información se almacena mediante servicios de terceros proporcionados por Google Firebase.</p>
+      <h2 data-i18n="privacy_3_title">3. Emmagatzematge de dades</h2>
+      <p data-i18n="privacy_3_text">La informació s'emmagatzema mitjançant serveis de tercers proporcionats per Google Firebase.</p>
 
-      <h2>4. Compartición de información</h2>
-      <p>La información podrá compartirse entre usuarios únicamente dentro del funcionamiento de la plataforma, cuando sea necesaria para facilitar oportunidades laborales o el contacto entre las partes.</p>
+      <h2 data-i18n="privacy_4_title">4. Compartició d'informació</h2>
+      <p data-i18n="privacy_4_text">La informació es podrà compartir entre usuaris únicament dins del funcionament de la plataforma, quan sigui necessària per facilitar oportunitats laborals o el contacte entre les parts.</p>
 
-      <h2>5. Seguridad</h2>
-      <p>AdWork aplica medidas razonables para proteger la información de los usuarios. Sin embargo, ningún sistema puede garantizar una seguridad absoluta.</p>
+      <h2 data-i18n="privacy_5_title">5. Seguretat</h2>
+      <p data-i18n="privacy_5_text">AdWork aplica mesures raonables per protegir la informació dels usuaris. Tanmateix, cap sistema pot garantir una seguretat absoluta.</p>
 
-      <h2>6. Derechos del usuario</h2>
-      <p>Los usuarios pueden solicitar la modificación o eliminación de sus datos, así como dejar de utilizar la plataforma en cualquier momento.</p>
+      <h2 data-i18n="privacy_6_title">6. Drets de l'usuari</h2>
+      <p data-i18n="privacy_6_text">Els usuaris poden sol·licitar la modificació o eliminació de les seves dades, així com deixar d'utilitzar la plataforma en qualsevol moment.</p>
 
-      <h2>7. Cookies y tecnologías similares</h2>
-      <p>AdWork puede utilizar cookies o tecnologías similares para mejorar la experiencia del usuario y el funcionamiento básico del sitio.</p>
+      <h2 data-i18n="privacy_7_title">7. Cookies i tecnologies similars</h2>
+      <p data-i18n="privacy_7_text">AdWork pot utilitzar cookies o tecnologies similars per millorar l'experiència de l'usuari i el funcionament bàsic del lloc.</p>
 
-      <h2>8. Cambios en esta política</h2>
-      <p>Esta Política de Privacidad puede ser modificada en cualquier momento. Se recomienda revisarla periódicamente.</p>
+      <h2 data-i18n="privacy_8_title">8. Canvis en aquesta política</h2>
+      <p data-i18n="privacy_8_text">Aquesta Política de Privacitat pot ser modificada en qualsevol moment. Es recomana revisar-la periòdicament.</p>
 
-      <h2>9. Contacto</h2>
-      <p>Para dudas relacionadas con privacidad o datos: adwork.contacto@gmail.com</p>
+      <h2 data-i18n="privacy_9_title">9. Contacte</h2>
+      <p data-i18n="privacy_9_text">Per dubtes relacionats amb privacitat o dades: adwork.contacto@gmail.com</p>
 
       <div class="legal-back">
-        <a href="index.html">← Volver a AdWork</a>
+        <a href="index.html" data-i18n="back_to_adwork">← Tornar a AdWork</a>
       </div>
     </div>
   </main>
+
+  <script src="legal-translations.js"></script>
 </body>
 </html>

@@ -4,21 +4,28 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>AdWork - Negoci</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="dashboard.css" />
+  <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg" />
 </head>
 <body>
   <div class="container">
     <div class="topbar">
       <div class="topbar-header">
         <div class="topbar-brand-group">
-          <div class="brand">AdWork</div>
+          <div class="brand-block">
+            <img src="./icons/adwork-mark.svg" alt="AdWork" class="brand-mark" />
+            <div class="logo">
+              <span class="logo-ad">Ad</span><span class="logo-work">Work</span>
+            </div>
+          </div>
           <div id="who" class="meta" data-i18n="loading">Carregant...</div>
         </div>
       </div>
       <div class="topbar-sub">
-
-        <!-- Selector de idioma -->
-        <div class="lang-switcher" style="position:relative;">
+        <div class="lang-switcher">
           <button type="button" id="langToggle" class="lang-btn">
             <span id="currentLang">CA</span> ▾
           </button>
@@ -27,7 +34,6 @@
             <button type="button" class="lang-option" data-lang="es">Español</button>
           </div>
         </div>
-
         <button id="logoutBtn" class="btn danger" data-i18n="logout">Sortir</button>
       </div>
     </div>
@@ -49,7 +55,6 @@
       <section class="card">
         <h3 data-i18n="publish_shift">Publicar torn</h3>
         <form id="jobForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
-
           <label>
             <span data-i18n="label_position">Lloc</span>
             <select id="role" required>
@@ -61,19 +66,16 @@
               <option value="otros" data-i18n="pos_other">Altres</option>
             </select>
           </label>
-
           <div id="otherRoleContainer" style="display:none;">
             <label>
               <span data-i18n="specify_position">Especificar lloc</span>
               <input id="otherRole" type="text" placeholder="Ex: Bartender, DJ..." />
             </label>
           </div>
-
           <label>
             <span data-i18n="label_date">Data</span>
             <input id="date" type="date" required />
           </label>
-
           <div class="row" style="gap:12px;">
             <label style="flex:1;">
               <span data-i18n="label_from">Des de</span>
@@ -84,22 +86,18 @@
               <input id="to" type="time" required />
             </label>
           </div>
-
           <label>
             <span data-i18n="label_pay">Pagament (€ / hora)</span>
             <input id="pay" type="number" min="0" step="0.5" required />
           </label>
-
           <label>
             <span data-i18n="label_zone">Zona (ex: Escaldes)</span>
             <input id="zone" type="text" required />
           </label>
-
           <label>
             <span data-i18n="label_notes">Notes (opcional)</span>
             <textarea id="notes" placeholder="Uniforme, experiència, idioma..."></textarea>
           </label>
-
           <button class="btn primary" type="submit" data-i18n="btn_publish">📢 Publicar</button>
           <div id="msg" class="meta"></div>
         </form>
@@ -182,9 +180,7 @@
       <a href="terms.html" data-i18n="footer_terms">Termes</a> · 
       <a href="privacy.html" data-i18n="footer_privacy">Privacitat</a>
     </div>
-    <div data-i18n="footer_contact">
-      © 2026 AdWork · contacte: adwork.contacto@gmail.com
-    </div>
+    <div data-i18n="footer_contact">© 2026 AdWork · contacte: adwork.contacto@gmail.com</div>
   </footer>
 </body>
 </html>

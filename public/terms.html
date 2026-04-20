@@ -1,56 +1,70 @@
 <!doctype html>
-<html lang="es">
+<html lang="ca">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Términos y Condiciones - AdWork</title>
+  <title>Termes i Condicions - AdWork</title>
   <link rel="stylesheet" href="styles.css">
 </head>
 <body>
   <main class="legal-page">
-    <div class="legal-card">
-      <h1>Términos y Condiciones</h1>
-      <p class="legal-date">Última actualización: 2026</p>
+    <div class="legal-card" style="position:relative;">
 
-      <h2>1. Introducción</h2>
-      <p>Bienvenido a AdWork. Al utilizar esta plataforma, aceptas los presentes Términos y Condiciones. Si no estás de acuerdo, no debes utilizar el servicio.</p>
+      <div class="lang-switcher">
+        <button type="button" id="langToggle" class="lang-btn">
+          <span id="currentLang">CA</span> ▾
+        </button>
 
-      <h2>2. Descripción del servicio</h2>
-      <p>AdWork es una plataforma que conecta trabajadores con negocios para la realización de trabajos temporales o extras en Andorra.</p>
+        <div id="langMenu" class="lang-menu hidden">
+          <button type="button" class="lang-option" data-lang="ca">Català</button>
+          <button type="button" class="lang-option" data-lang="es">Español</button>
+        </div>
+      </div>
 
-      <h2>3. Rol de AdWork</h2>
-      <p>AdWork actúa únicamente como intermediario digital entre usuarios. No participa en la relación laboral ni en acuerdos económicos entre trabajadores y negocios.</p>
+      <h1 data-i18n="terms_title">Termes i Condicions</h1>
+      <p class="legal-date" data-i18n="terms_date">Última actualització: 2026</p>
 
-      <h2>4. Responsabilidad</h2>
-      <p>Los acuerdos realizados entre usuarios son responsabilidad exclusiva de las partes involucradas. AdWork no garantiza pagos, condiciones laborales, cumplimiento de servicios ni calidad del trabajo.</p>
+      <h2 data-i18n="terms_1_title">1. Introducció</h2>
+      <p data-i18n="terms_1_text">Benvingut a AdWork. En utilitzar aquesta plataforma, acceptes els presents Termes i Condicions. Si no hi estàs d'acord, no has d'utilitzar el servei.</p>
 
-      <h2>5. Uso adecuado</h2>
-      <p>Los usuarios se comprometen a:</p>
+      <h2 data-i18n="terms_2_title">2. Descripció del servei</h2>
+      <p data-i18n="terms_2_text">AdWork és una plataforma que connecta treballadors amb negocis per a la realització de treballs temporals o extres a Andorra.</p>
+
+      <h2 data-i18n="terms_3_title">3. Rol d'AdWork</h2>
+      <p data-i18n="terms_3_text">AdWork actua únicament com a intermediari digital entre usuaris. No participa en la relació laboral ni en acords econòmics entre treballadors i negocis.</p>
+
+      <h2 data-i18n="terms_4_title">4. Responsabilitat</h2>
+      <p data-i18n="terms_4_text">Els acords realitzats entre usuaris són responsabilitat exclusiva de les parts involucrades. AdWork no garanteix pagaments, condicions laborals, compliment de serveis ni qualitat del treball.</p>
+
+      <h2 data-i18n="terms_5_title">5. Ús adequat</h2>
+      <p data-i18n="terms_5_text">Els usuaris es comprometen a:</p>
       <ul>
-        <li>Proporcionar información veraz</li>
-        <li>No realizar actividades fraudulentas</li>
-        <li>No usar la plataforma con fines ilegales</li>
+        <li data-i18n="terms_5_item_1">Proporcionar informació veraç</li>
+        <li data-i18n="terms_5_item_2">No realitzar activitats fraudulentes</li>
+        <li data-i18n="terms_5_item_3">No utilitzar la plataforma amb finalitats il·legals</li>
       </ul>
 
-      <h2>6. Cuentas de usuario</h2>
-      <p>Cada usuario es responsable de la seguridad de su cuenta y de la información que publica.</p>
+      <h2 data-i18n="terms_6_title">6. Comptes d'usuari</h2>
+      <p data-i18n="terms_6_text">Cada usuari és responsable de la seguretat del seu compte i de la informació que publica.</p>
 
-      <h2>7. Eliminación o suspensión</h2>
-      <p>AdWork se reserva el derecho de suspender o eliminar cuentas que incumplan estos términos o hagan un uso indebido de la plataforma.</p>
+      <h2 data-i18n="terms_7_title">7. Eliminació o suspensió</h2>
+      <p data-i18n="terms_7_text">AdWork es reserva el dret de suspendre o eliminar comptes que incompleixin aquests termes o facin un ús indegut de la plataforma.</p>
 
-      <h2>8. Modificaciones</h2>
-      <p>AdWork puede modificar estos términos en cualquier momento. Se recomienda revisarlos periódicamente.</p>
+      <h2 data-i18n="terms_8_title">8. Modificacions</h2>
+      <p data-i18n="terms_8_text">AdWork pot modificar aquests termes en qualsevol moment. Es recomana revisar-los periòdicament.</p>
 
-      <h2>9. Limitación de responsabilidad</h2>
-      <p>AdWork no será responsable por daños directos o indirectos derivados del uso de la plataforma.</p>
+      <h2 data-i18n="terms_9_title">9. Limitació de responsabilitat</h2>
+      <p data-i18n="terms_9_text">AdWork no serà responsable per danys directes o indirectes derivats de l'ús de la plataforma.</p>
 
-      <h2>10. Contacto</h2>
-      <p>Para consultas o soporte: adwork.contacto@gmail.com</p>
+      <h2 data-i18n="terms_10_title">10. Contacte</h2>
+      <p data-i18n="terms_10_text">Per consultes o suport: adwork.contacto@gmail.com</p>
 
       <div class="legal-back">
-        <a href="index.html">← Volver a AdWork</a>
+        <a href="index.html" data-i18n="back_to_adwork">← Tornar a AdWork</a>
       </div>
     </div>
   </main>
+
+  <script src="legal-translations.js"></script>
 </body>
 </html>

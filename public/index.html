@@ -1,20 +1,31 @@
 <!doctype html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>AdWork - Login</title>
-    <link rel="stylesheet" href="styles.css" />
-    <meta name="description" content="Conectamos trabajadores con negocios para turnos y extras en Andorra." />
-    <meta property="og:title" content="AdWork - Extras y turnos en Andorra" />
-    <meta property="og:description" content="Conectamos trabajadores con negocios para turnos y extras en Andorra." />
-    <meta property="og:type" content="website" />
-  </head>
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AdWork - Login</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="styles.css" />
+  <meta name="description" content="Conectamos trabajadores con negocios para turnos y extras en Andorra." />
+  <meta property="og:title" content="AdWork - Extras y turnos en Andorra" />
+  <meta property="og:description" content="Conectamos trabajadores con negocios para turnos y extras en Andorra." />
+  <meta property="og:type" content="website" />
+  <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg" />
+</head>
   <body>
     <main class="container">
       <header class="header">
         <div class="header-top">
-          <div class="logo">AdWork</div>
+          <div class="brand-block">
+            <img src="./icons/adwork-mark.svg" alt="AdWork" class="brand-mark" />
+            <div class="logo">
+              <span class="logo-ad">Ad</span><span class="logo-work">Work</span>
+            </div>
+          </div>
         
           <div class="lang-switcher">
             <button type="button" id="langToggle" class="lang-btn">
@@ -74,7 +85,7 @@
             </label>
           
             <label>
-              <span data-i18n="label_role">Soc</span>
+              <span data-i18n="label_role">Perfil</span>
               <select id="regRole" required>
                 <option value="worker" data-i18n="role_worker">Treballador (extres)</option>
                 <option value="business" data-i18n="role_business">Negoci</option>
