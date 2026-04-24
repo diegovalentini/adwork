@@ -5,6 +5,53 @@
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
+    ],
+    "redirects": [
+      {
+        "source": "/index.html",
+        "destination": "/maintenance.html",
+        "type": 302
+      },
+      {
+        "source": "/",
+        "destination": "/maintenance.html",
+        "type": 302
+      },
+      {
+        "source": "/worker.html",
+        "destination": "/maintenance.html",
+        "type": 302
+      },
+      {
+        "source": "/business.html",
+        "destination": "/maintenance.html",
+        "type": 302
+      }
+    ],
+    "headers": [
+      {
+        "source": "**",
+        "headers": [
+          {
+            "key": "Cache-Control",
+            "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      }
     ]
-  }
+  },
+  "functions": [
+    {
+      "source": "functions",
+      "codebase": "default",
+      "disallowLegacyRuntimeConfig": true,
+      "ignore": [
+        "node_modules",
+        ".git",
+        "firebase-debug.log",
+        "firebase-debug.*.log",
+        "*.local"
+      ]
+    }
+  ]
 }

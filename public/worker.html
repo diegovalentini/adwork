@@ -11,163 +11,184 @@
   <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg" />
 </head>
 <body>
-  <div class="container">
-    <div class="topbar">
-      <div class="topbar-header">
-        <div class="brand-block">
-          <img src="./icons/adwork-mark.svg" alt="AdWork" class="brand-mark" />
-          <div class="logo">
-            <span class="logo-ad">Ad</span><span class="logo-work">Work</span>
-          </div>
-        </div>
-      </div>
-      <div class="topbar-sub">
-        <span id="availabilityBadge" class="badge off">🔴 No disponible</span>
-        <button id="toggleAvail" class="btn primary" data-i18n="worker_toggle_status">Canviar estat</button>
 
-        <div class="lang-switcher">
-          <button type="button" id="langToggle" class="lang-btn">
-            <span id="currentLang">CA</span> ▾
-          </button>
-          <div id="langMenu" class="lang-menu hidden">
-            <button type="button" class="lang-option" data-lang="ca">Català</button>
-            <button type="button" class="lang-option" data-lang="es">Español</button>
-          </div>
-        </div>
+  <!-- SPINNER inicial -->
+  <div id="appSpinner" class="spinner-overlay">
+    <div class="spinner"></div>
+  </div>
 
-        <button id="logoutBtn" class="logout-icon-btn" aria-label="Cerrar sesión">
-          <img src="icons/salida.png" alt="Cerrar sesión" />
-        </button>
-      </div>
-    </div>
-
-    <div class="grid">
-      <section class="card">
-        <div class="row" style="justify-content:space-between;">
-          <h3 style="margin:0;" data-i18n="worker_profile_title">El meu perfil</h3>
-          <button id="openEditProfile" class="btn primary" data-i18n="common_edit">Editar</button>
-        </div>
-        <div class="item" style="margin-top:12px;">
-          <div class="row" style="gap:12px; align-items:flex-start;">
-            <img id="profilePhoto" style="width:64px;height:64px;border-radius:16px;object-fit:cover;" />
-            <div>
-              <div class="title" id="pName">—</div>
-              <div class="sub" id="pRole">—</div>
-              <div class="sub" id="pLocation">—</div>
-              <div class="sub" id="pBio">—</div>
-              <div class="sub" id="pDays">—</div>
-              <div class="sub" id="pHours">—</div>
+  <!-- CONTENIDO principal (oculto hasta que carga) -->
+  <div id="appContent" class="hidden">
+    <div class="container">
+      <div class="topbar">
+        <div class="topbar-header">
+          <div class="brand-block">
+            <img src="./icons/adwork-mark.svg" alt="AdWork" class="brand-mark" />
+            <div class="logo">
+              <span class="logo-ad">Ad</span><span class="logo-work">Work</span>
             </div>
           </div>
         </div>
-      </section>
-
-      <section class="card">
-        <h3 data-i18n="worker_contact_requests">Sol·licituds de contacte</h3>
-        <div class="list" id="contactReqList"></div>
-      </section>
-
-      <section class="card">
-        <h3 data-i18n="worker_available_jobs">Torns disponibles</h3>
-        <div class="list" id="jobsList"></div>
-      </section>
-
-      <section class="card">
-        <h3 data-i18n="worker_my_applications">Les meves postulacions</h3>
-        <div class="list" id="myAppsList"></div>
-      </section>
-
-      <section class="card">
-        <h3 data-i18n="common_history">Historial</h3>
-        <div class="list" id="workerHistoryList"></div>
-      </section>
-    </div>
-  </div>
-
-  <!-- Modal Editar Perfil -->
-  <div id="editProfileModal" class="modalOverlay hidden">
-    <div class="card modalCard">
-      <div class="modalHeader">
-        <h3 data-i18n="worker_edit_profile">Editar perfil</h3>
-        <button id="closeEditProfile" class="btn">✕</button>
-      </div>
-      <form id="profileForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
-        <label>
-          <span data-i18n="worker_name">Nom</span>
-          <input id="editName" type="text" />
-        </label>
-        <label>
-          <span data-i18n="worker_location">Ubicació</span>
-          <input id="editLocation" type="text" />
-        </label>
-        <label>
-          <span data-i18n="worker_days">Dies disponibles</span>
-          <div class="row" style="flex-wrap:wrap; gap:8px;">
-            <label><input type="checkbox" class="dayChk" value="Lun" /> Dl</label>
-            <label><input type="checkbox" class="dayChk" value="Mar" /> Dm</label>
-            <label><input type="checkbox" class="dayChk" value="Mié" /> Dc</label>
-            <label><input type="checkbox" class="dayChk" value="Jue" /> Dj</label>
-            <label><input type="checkbox" class="dayChk" value="Vie" /> Dv</label>
-            <label><input type="checkbox" class="dayChk" value="Sáb" /> Ds</label>
-            <label><input type="checkbox" class="dayChk" value="Dom" /> Dg</label>
+        <div class="topbar-sub">
+          <span id="availabilityBadge" class="badge off">🔴 No disponible</span>
+          <button id="toggleAvail" class="btn primary" data-i18n="worker_toggle_status">Canviar estat</button>
+          <div class="lang-switcher">
+            <button type="button" id="langToggle" class="lang-btn">
+              <span id="currentLang">CA</span> ▾
+            </button>
+            <div id="langMenu" class="lang-menu hidden">
+              <button type="button" class="lang-option" data-lang="ca">Català</button>
+              <button type="button" class="lang-option" data-lang="es">Español</button>
+            </div>
           </div>
-        </label>
-        <label>
-          <span data-i18n="worker_hours">Horari disponible</span>
-          <input id="editHours" type="text" placeholder="16h a 22h" />
-        </label>
-        <label>
-          <span data-i18n="worker_photo">Foto de perfil</span>
-          <input id="editPhotoFile" type="file" accept="image/*" />
-        </label>
-        <img id="photoPreview" style="width:72px;height:72px;border-radius:16px;object-fit:cover;" />
-        <div id="uploadHint" class="meta">Subí una imagen (jpg/png)</div>
-        <label>
-          <span data-i18n="worker_bio">Descripció</span>
-          <textarea id="editBio"></textarea>
-        </label>
-        <button class="btn primary" type="submit" data-i18n="worker_save_changes">Desar canvis</button>
-        <div id="profileMsg" class="meta"></div>
-      </form>
-    </div>
-  </div>
-
-  <!-- Modal Compartir Contacto -->
-  <div id="shareContactModal" class="modalOverlay hidden">
-    <div class="card modalCard">
-      <div class="modalHeader">
-        <h3 data-i18n="worker_share_contact">Compartir contacte</h3>
-        <button id="closeShareContact" class="btn">✕</button>
+          <button id="logoutBtn" class="logout-icon-btn" aria-label="Cerrar sesión">
+            <img src="icons/salida.png" alt="Cerrar sesión" />
+          </button>
+        </div>
       </div>
-      <form id="shareContactForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
-        <input type="hidden" id="shareReqId" />
-        <label>
-          <span data-i18n="worker_whatsapp_optional">WhatsApp (opcional)</span>
-          <input id="shareWhatsapp" type="text" placeholder="+376..." />
-        </label>
-        <label>
-          <span data-i18n="worker_phone_optional">Telèfon (opcional)</span>
-          <input id="sharePhone" type="text" />
-        </label>
-        <label>
-          <span data-i18n="worker_email_optional">Email (opcional)</span>
-          <input id="shareEmail" type="email" />
-        </label>
-        <button class="btn primary" type="submit" data-i18n="worker_share">Compartir</button>
-        <div id="shareContactMsg" class="meta"></div>
-      </form>
+
+      <!-- ONBOARDING BANNER -->
+      <div id="onboardingBanner" class="onboarding-banner hidden">
+        <div>
+          <div id="onboardingTitle" class="onboarding-title">👋 Benvingut a AdWork!</div>
+          <div id="onboardingText" class="onboarding-text">Per que les empreses et trobin, completa el teu perfil i activa la teva disponibilitat.</div>
+        </div>
+        <button id="onboardingBtn" class="btn primary">Completar perfil</button>
+      </div>
+
+      <div class="grid">
+        <section class="card">
+          <div class="row" style="justify-content:space-between;">
+            <h3 style="margin:0;" data-i18n="worker_profile_title">El meu perfil</h3>
+            <button id="openEditProfile" class="btn primary" data-i18n="common_edit">Editar</button>
+          </div>
+          <div class="item" style="margin-top:12px;">
+            <div class="row" style="gap:12px; align-items:flex-start;">
+              <img id="profilePhoto" style="width:64px;height:64px;border-radius:16px;object-fit:cover;" />
+              <div>
+                <div class="title" id="pName">—</div>
+                <div class="sub" id="pRole">—</div>
+                <div class="sub" id="pLocation">—</div>
+                <div class="sub" id="pBio">—</div>
+                <div class="sub" id="pDays">—</div>
+                <div class="sub" id="pHours">—</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section class="card">
+          <h3 data-i18n="worker_contact_requests">Sol·licituds de contacte</h3>
+          <div class="list" id="contactReqList"></div>
+        </section>
+
+        <section class="card">
+          <h3 data-i18n="worker_available_jobs">Torns disponibles</h3>
+          <div class="list" id="jobsList"></div>
+        </section>
+
+        <section class="card">
+          <h3 data-i18n="worker_my_applications">Les meves postulacions</h3>
+          <div class="list" id="myAppsList"></div>
+        </section>
+
+        <section class="card">
+          <h3 data-i18n="worker_shared_contacts">Contactes compartits</h3>
+          <div class="list" id="sharedContactsList"></div>
+        </section>
+
+        <section class="card">
+          <h3 data-i18n="common_history">Historial</h3>
+          <div class="list" id="workerHistoryList"></div>
+        </section>
+      </div>
     </div>
+
+    <!-- Modal Editar Perfil -->
+    <div id="editProfileModal" class="modalOverlay hidden">
+      <div class="card modalCard">
+        <div class="modalHeader">
+          <h3 data-i18n="worker_edit_profile">Editar perfil</h3>
+          <button id="closeEditProfile" class="btn">✕</button>
+        </div>
+        <form id="profileForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
+          <label>
+            <span data-i18n="worker_name">Nom</span>
+            <input id="editName" type="text" />
+          </label>
+          <label>
+            <span data-i18n="worker_location">Ubicació</span>
+            <input id="editLocation" type="text" />
+          </label>
+          <label>
+            <span data-i18n="worker_days">Dies disponibles</span>
+            <div class="row" style="flex-wrap:wrap; gap:8px;">
+              <label><input type="checkbox" class="dayChk" value="Lun" /> Dl</label>
+              <label><input type="checkbox" class="dayChk" value="Mar" /> Dm</label>
+              <label><input type="checkbox" class="dayChk" value="Mié" /> Dc</label>
+              <label><input type="checkbox" class="dayChk" value="Jue" /> Dj</label>
+              <label><input type="checkbox" class="dayChk" value="Vie" /> Dv</label>
+              <label><input type="checkbox" class="dayChk" value="Sáb" /> Ds</label>
+              <label><input type="checkbox" class="dayChk" value="Dom" /> Dg</label>
+            </div>
+          </label>
+          <label>
+            <span data-i18n="worker_hours">Horari disponible</span>
+            <input id="editHours" type="text" placeholder="16h a 22h" />
+          </label>
+          <label>
+            <span data-i18n="worker_photo">Foto de perfil</span>
+            <input id="editPhotoFile" type="file" accept="image/*" />
+          </label>
+          <img id="photoPreview" style="width:72px;height:72px;border-radius:16px;object-fit:cover;" />
+          <div id="uploadHint" class="meta"></div>
+          <label>
+            <span data-i18n="worker_bio">Descripció</span>
+            <textarea id="editBio"></textarea>
+          </label>
+          <button class="btn primary" type="submit" data-i18n="worker_save_changes">Desar canvis</button>
+          <div id="profileMsg" class="meta"></div>
+        </form>
+      </div>
+    </div>
+
+    <!-- Modal Compartir Contacto -->
+    <div id="shareContactModal" class="modalOverlay hidden">
+      <div class="card modalCard">
+        <div class="modalHeader">
+          <h3 data-i18n="worker_share_contact">Compartir contacte</h3>
+          <button id="closeShareContact" class="btn">✕</button>
+        </div>
+        <form id="shareContactForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
+          <input type="hidden" id="shareReqId" />
+          <label>
+            <span data-i18n="worker_whatsapp_optional">WhatsApp (opcional)</span>
+            <input id="shareWhatsapp" type="text" placeholder="+376..." />
+          </label>
+          <label>
+            <span data-i18n="worker_phone_optional">Telèfon (opcional)</span>
+            <input id="sharePhone" type="text" />
+          </label>
+          <label>
+            <span data-i18n="worker_email_optional">Email (opcional)</span>
+            <input id="shareEmail" type="email" />
+          </label>
+          <button class="btn primary" type="submit" data-i18n="worker_share">Compartir</button>
+          <div id="shareContactMsg" class="meta"></div>
+        </form>
+      </div>
+    </div>
+
+    <footer class="footer">
+      <div style="margin-bottom:6px;">
+        <a href="terms.html" data-i18n="footer_terms">Termes</a> · 
+        <a href="privacy.html" data-i18n="footer_privacy">Privacitat</a>
+      </div>
+      <div data-i18n="footer_contact">© 2026 AdWork · contacte@adwork.ad</div>
+    </footer>
   </div>
 
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dashboard-worker.js"></script>
-
-  <footer class="footer">
-    <div style="margin-bottom:6px;">
-      <a href="terms.html" data-i18n="footer_terms">Termes</a> · 
-      <a href="privacy.html" data-i18n="footer_privacy">Privacitat</a>
-    </div>
-    <div data-i18n="footer_contact">© 2026 AdWork · contacte: adwork.contacto@gmail.com</div>
-  </footer>
 </body>
 </html>

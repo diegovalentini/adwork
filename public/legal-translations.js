@@ -36,7 +36,7 @@ const legalTranslations = {
     privacy_8_text: "Aquesta Política de Privacitat pot ser modificada en qualsevol moment. Es recomana revisar-la periòdicament.",
 
     privacy_9_title: "9. Contacte",
-    privacy_9_text: "Per dubtes relacionats amb privacitat o dades: adwork.contacto@gmail.com",
+    privacy_9_text: "Per dubtes relacionats amb privacitat o dades: contacte@adwork.ad",
 
     // Terms
     terms_title: "Termes i Condicions",
@@ -73,7 +73,7 @@ const legalTranslations = {
     terms_9_text: "AdWork no serà responsable per danys directes o indirectes derivats de l'ús de la plataforma.",
 
     terms_10_title: "10. Contacte",
-    terms_10_text: "Per consultes o suport: adwork.contacto@gmail.com"
+    terms_10_text: "Per consultes o suport: contacte@adwork.ad"
   },
 
   es: {
@@ -113,7 +113,7 @@ const legalTranslations = {
     privacy_8_text: "Esta Política de Privacidad puede ser modificada en cualquier momento. Se recomienda revisarla periódicamente.",
 
     privacy_9_title: "9. Contacto",
-    privacy_9_text: "Para dudas relacionadas con privacidad o datos: adwork.contacto@gmail.com",
+    privacy_9_text: "Para dudas relacionadas con privacidad o datos: contacte@adwork.ad",
 
     // Terms
     terms_title: "Términos y Condiciones",
@@ -150,7 +150,7 @@ const legalTranslations = {
     terms_9_text: "AdWork no será responsable por daños directos o indirectos derivados del uso de la plataforma.",
 
     terms_10_title: "10. Contacto",
-    terms_10_text: "Para consultas o soporte: adwork.contacto@gmail.com"
+    terms_10_text: "Para consultas o soporte: contacte@adwork.ad"
   }
 };
 

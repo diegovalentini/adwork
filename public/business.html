@@ -11,176 +11,194 @@
   <link rel="icon" type="image/svg+xml" href="./icons/favicon.svg" />
 </head>
 <body>
-  <div class="container">
-    <div class="topbar">
-      <div class="topbar-header">
-        <div class="topbar-brand-group">
-          <div class="brand-block">
-            <img src="./icons/adwork-mark.svg" alt="AdWork" class="brand-mark" />
-            <div class="logo">
-              <span class="logo-ad">Ad</span><span class="logo-work">Work</span>
+
+  <!-- SPINNER inicial -->
+  <div id="appSpinner" class="spinner-overlay">
+    <div class="spinner"></div>
+  </div>
+
+  <!-- CONTENIDO principal -->
+  <div id="appContent" class="hidden">
+    <div class="container">
+      <div class="topbar">
+        <div class="topbar-header">
+          <div class="topbar-brand-group">
+            <div class="brand-block">
+              <img src="./icons/adwork-mark.svg" alt="AdWork" class="brand-mark" />
+              <div class="logo">
+                <span class="logo-ad">Ad</span><span class="logo-work">Work</span>
+              </div>
+            </div>
+            <div id="who" class="meta" data-i18n="loading">Carregant...</div>
+          </div>
+        </div>
+        <div class="topbar-sub">
+          <div class="lang-switcher">
+            <button type="button" id="langToggle" class="lang-btn">
+              <span id="currentLang">CA</span> ▾
+            </button>
+            <div id="langMenu" class="lang-menu hidden">
+              <button type="button" class="lang-option" data-lang="ca">Català</button>
+              <button type="button" class="lang-option" data-lang="es">Español</button>
             </div>
           </div>
-          <div id="who" class="meta" data-i18n="loading">Carregant...</div>
+          <button id="logoutBtn" class="btn danger" data-i18n="logout">Sortir</button>
         </div>
       </div>
-      <div class="topbar-sub">
-        <div class="lang-switcher">
-          <button type="button" id="langToggle" class="lang-btn">
-            <span id="currentLang">CA</span> ▾
-          </button>
-          <div id="langMenu" class="lang-menu hidden">
-            <button type="button" class="lang-option" data-lang="ca">Català</button>
-            <button type="button" class="lang-option" data-lang="es">Español</button>
-          </div>
+
+      <!-- ONBOARDING BANNER -->
+      <div id="onboardingBanner" class="onboarding-banner hidden">
+        <div>
+          <div id="onboardingTitle" class="onboarding-title">👋 Benvingut a AdWork!</div>
+          <div id="onboardingText" class="onboarding-text">Completa el perfil de la teva empresa i publica el primer torn per trobar treballadors.</div>
         </div>
-        <button id="logoutBtn" class="btn danger" data-i18n="logout">Sortir</button>
+        <button id="onboardingBtn" class="btn primary">Completar perfil</button>
+      </div>
+
+      <section class="card">
+        <div class="row" style="justify-content:space-between; margin-bottom:12px;">
+          <h3 style="margin:0;" data-i18n="my_company">La meva empresa</h3>
+          <button id="openEditCompany" class="btn primary" data-i18n="edit">Editar</button>
+        </div>
+        <div class="item">
+          <div class="title" id="bCompanyName">—</div>
+          <div class="sub" id="bCompanyType">—</div>
+          <div class="sub" id="bCompanyLocation">—</div>
+          <div class="sub" id="bRating">—</div>
+        </div>
+      </section>
+
+      <div class="grid">
+        <section class="card">
+          <h3 data-i18n="publish_shift">Publicar torn</h3>
+          <form id="jobForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
+            <label>
+              <span data-i18n="label_position">Lloc</span>
+              <select id="role" required>
+                <option value="camarero" data-i18n="pos_waiter">Cambrer</option>
+                <option value="cocina" data-i18n="pos_kitchen">Cuina</option>
+                <option value="limpieza" data-i18n="pos_cleaning">Neteja</option>
+                <option value="recepcion" data-i18n="pos_reception">Recepció</option>
+                <option value="pica" data-i18n="pos_pica">Pica</option>
+                <option value="otros" data-i18n="pos_other">Altres</option>
+              </select>
+            </label>
+            <div id="otherRoleContainer" style="display:none;">
+              <label>
+                <span data-i18n="specify_position">Especificar lloc</span>
+                <input id="otherRole" type="text" placeholder="Ex: Bartender, DJ..." />
+              </label>
+            </div>
+            <label>
+              <span data-i18n="label_date">Data</span>
+              <input id="date" type="date" required />
+            </label>
+            <div class="row" style="gap:12px;">
+              <label style="flex:1;">
+                <span data-i18n="label_from">Des de</span>
+                <input id="from" type="time" required />
+              </label>
+              <label style="flex:1;">
+                <span data-i18n="label_to">Fins</span>
+                <input id="to" type="time" required />
+              </label>
+            </div>
+            <label>
+              <span data-i18n="label_pay">Pagament (€ / hora)</span>
+              <input id="pay" type="number" min="0" step="0.5" required />
+            </label>
+            <label>
+              <span data-i18n="label_zone">Zona (ex: Escaldes)</span>
+              <input id="zone" type="text" required />
+            </label>
+            <label>
+              <span data-i18n="label_notes">Notes (opcional)</span>
+              <textarea id="notes" placeholder="Uniforme, experiència, idioma..."></textarea>
+            </label>
+            <button class="btn primary" type="submit" data-i18n="btn_publish">📢 Publicar</button>
+            <div id="msg" class="meta"></div>
+          </form>
+        </section>
+
+        <section class="card">
+          <h3 data-i18n="my_published_shifts">Els meus torns publicats</h3>
+          <div class="list" id="myJobsList"></div>
+        </section>
+
+        <section class="card">
+          <h3 data-i18n="history">Historial</h3>
+          <div class="list" id="businessHistoryList"></div>
+        </section>
+
+        <section class="card">
+          <h3 data-i18n="available_workers">Treballadors disponibles</h3>
+          <div class="list" id="workersList"></div>
+        </section>
+
+        <section class="card">
+          <h3 data-i18n="contacts">Contactes</h3>
+          <div class="list" id="contactsList"></div>
+        </section>
       </div>
     </div>
 
-    <section class="card">
-      <div class="row" style="justify-content:space-between; margin-bottom:12px;">
-        <h3 style="margin:0;" data-i18n="my_company">La meva empresa</h3>
-        <button id="openEditCompany" class="btn primary" data-i18n="edit">Editar</button>
-      </div>
-      <div class="item">
-        <div class="title" id="bCompanyName">—</div>
-        <div class="sub" id="bCompanyType">—</div>
-        <div class="sub" id="bCompanyLocation">—</div>
-        <div class="sub" id="bRating">—</div>
-      </div>
-    </section>
-
-    <div class="grid">
-      <section class="card">
-        <h3 data-i18n="publish_shift">Publicar torn</h3>
-        <form id="jobForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
+    <!-- Modal Editar Empresa -->
+    <div id="editCompanyModal" class="modalOverlay hidden">
+      <div class="card modalCard">
+        <div class="modalHeader">
+          <h3 data-i18n="edit_company">Editar empresa</h3>
+          <button id="closeEditCompany" class="btn">✕</button>
+        </div>
+        <form id="businessProfileForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
           <label>
-            <span data-i18n="label_position">Lloc</span>
-            <select id="role" required>
-              <option value="camarero" data-i18n="pos_waiter">Cambrer</option>
-              <option value="cocina" data-i18n="pos_kitchen">Cuina</option>
-              <option value="limpieza" data-i18n="pos_cleaning">Neteja</option>
-              <option value="recepcion" data-i18n="pos_reception">Recepció</option>
-              <option value="pica" data-i18n="pos_pica">Pica</option>
-              <option value="otros" data-i18n="pos_other">Altres</option>
+            <span data-i18n="label_company_name">Nom de l'empresa</span>
+            <input id="editCompanyName" type="text" />
+          </label>
+          <label>
+            <span data-i18n="label_sector">Sector</span>
+            <select id="editCompanyType">
+              <option value="hotel" data-i18n="sector_hotel">Hotel</option>
+              <option value="restaurante" data-i18n="sector_restaurant">Restaurant</option>
+              <option value="comercio" data-i18n="sector_shop">Comerç</option>
+              <option value="otros" data-i18n="sector_other">Altres</option>
             </select>
           </label>
-          <div id="otherRoleContainer" style="display:none;">
-            <label>
-              <span data-i18n="specify_position">Especificar lloc</span>
-              <input id="otherRole" type="text" placeholder="Ex: Bartender, DJ..." />
-            </label>
-          </div>
           <label>
-            <span data-i18n="label_date">Data</span>
-            <input id="date" type="date" required />
-          </label>
-          <div class="row" style="gap:12px;">
-            <label style="flex:1;">
-              <span data-i18n="label_from">Des de</span>
-              <input id="from" type="time" required />
-            </label>
-            <label style="flex:1;">
-              <span data-i18n="label_to">Fins</span>
-              <input id="to" type="time" required />
-            </label>
-          </div>
-          <label>
-            <span data-i18n="label_pay">Pagament (€ / hora)</span>
-            <input id="pay" type="number" min="0" step="0.5" required />
+            <span data-i18n="label_location">Ubicació</span>
+            <input id="editCompanyLocation" type="text" />
           </label>
           <label>
-            <span data-i18n="label_zone">Zona (ex: Escaldes)</span>
-            <input id="zone" type="text" required />
+            <span data-i18n="label_description">Descripció (opcional)</span>
+            <textarea id="editCompanyBio" placeholder="Ex: Hotel 4* al centre..."></textarea>
           </label>
-          <label>
-            <span data-i18n="label_notes">Notes (opcional)</span>
-            <textarea id="notes" placeholder="Uniforme, experiència, idioma..."></textarea>
-          </label>
-          <button class="btn primary" type="submit" data-i18n="btn_publish">📢 Publicar</button>
-          <div id="msg" class="meta"></div>
+          <button class="btn primary" type="submit" data-i18n="btn_save">Desar</button>
+          <div id="businessProfileMsg" class="meta"></div>
         </form>
-      </section>
-
-      <section class="card">
-        <h3 data-i18n="my_published_shifts">Els meus torns publicats</h3>
-        <div class="list" id="myJobsList"></div>
-      </section>
-
-      <section class="card">
-        <h3 data-i18n="history">Historial</h3>
-        <div class="list" id="businessHistoryList"></div>
-      </section>
-
-      <section class="card">
-        <h3 data-i18n="available_workers">Treballadors disponibles</h3>
-        <div class="list" id="workersList"></div>
-      </section>
-
-      <section class="card">
-        <h3 data-i18n="contacts">Contactes</h3>
-        <div class="list" id="contactsList"></div>
-      </section>
-    </div>
-  </div>
-
-  <!-- Modal Editar Empresa -->
-  <div id="editCompanyModal" class="modalOverlay hidden">
-    <div class="card modalCard">
-      <div class="modalHeader">
-        <h3 data-i18n="edit_company">Editar empresa</h3>
-        <button id="closeEditCompany" class="btn">✕</button>
       </div>
-      <form id="businessProfileForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
-        <label>
-          <span data-i18n="label_company_name">Nom de l'empresa</span>
-          <input id="editCompanyName" type="text" />
-        </label>
-        <label>
-          <span data-i18n="label_sector">Sector</span>
-          <select id="editCompanyType">
-            <option value="hotel" data-i18n="sector_hotel">Hotel</option>
-            <option value="restaurante" data-i18n="sector_restaurant">Restaurant</option>
-            <option value="comercio" data-i18n="sector_shop">Comerç</option>
-            <option value="otros" data-i18n="sector_other">Altres</option>
-          </select>
-        </label>
-        <label>
-          <span data-i18n="label_location">Ubicació</span>
-          <input id="editCompanyLocation" type="text" />
-        </label>
-        <label>
-          <span data-i18n="label_description">Descripció (opcional)</span>
-          <textarea id="editCompanyBio" placeholder="Ex: Hotel 4* al centre..."></textarea>
-        </label>
-        <button class="btn primary" type="submit" data-i18n="btn_save">Desar</button>
-        <div id="businessProfileMsg" class="meta"></div>
-      </form>
     </div>
-  </div>
 
-  <!-- Modal Postulados -->
-  <div id="appsModal" class="modalOverlay hidden">
-    <div class="card modalCard">
-      <div class="modalHeader">
-        <h3 id="appsModalTitle" data-i18n="applicants_title">Postulats</h3>
-        <button id="closeAppsModal" class="btn">✕</button>
+    <!-- Modal Postulados -->
+    <div id="appsModal" class="modalOverlay hidden">
+      <div class="card modalCard">
+        <div class="modalHeader">
+          <h3 id="appsModalTitle" data-i18n="applicants_title">Postulats</h3>
+          <button id="closeAppsModal" class="btn">✕</button>
+        </div>
+        <div class="meta" id="appsModalSub" data-i18n="applicants_loading">Carregant...</div>
+        <div class="list" id="appsModalList" style="margin-top:12px;"></div>
       </div>
-      <div class="meta" id="appsModalSub" data-i18n="applicants_loading">Carregant...</div>
-      <div class="list" id="appsModalList" style="margin-top:12px;"></div>
     </div>
+
+    <footer class="footer">
+      <div style="margin-bottom:6px;">
+        <a href="terms.html" data-i18n="footer_terms">Termes</a> · 
+        <a href="privacy.html" data-i18n="footer_privacy">Privacitat</a>
+      </div>
+      <div data-i18n="footer_contact">© 2026 AdWork · contacte@adwork.ad</div>
+    </footer>
   </div>
 
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="dashboard-business.js"></script>
-
-  <footer class="footer">
-    <div style="margin-bottom:6px;">
-      <a href="terms.html" data-i18n="footer_terms">Termes</a> · 
-      <a href="privacy.html" data-i18n="footer_privacy">Privacitat</a>
-    </div>
-    <div data-i18n="footer_contact">© 2026 AdWork · contacte: adwork.contacto@gmail.com</div>
-  </footer>
 </body>
 </html>

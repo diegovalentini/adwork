@@ -1,0 +1,356 @@
+<!doctype html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AdWork — Pròximament</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,600;1,9..40,300&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg: #0e1410;
+      --green: #1D9E68;
+      --green-bright: #2BE39A;
+      --green-dim: rgba(29,158,104,0.12);
+      --green-border: rgba(29,158,104,0.22);
+      --text: #DDE8E4;
+      --muted: #6B8A7A;
+      --card: rgba(20,28,24,0.85);
+    }
+
+    html, body {
+      height: 100%;
+    }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 20px;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Fondo animado */
+    .bg-orb {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(80px);
+      pointer-events: none;
+      z-index: 0;
+    }
+
+    .bg-orb-1 {
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(29,158,104,0.18) 0%, transparent 70%);
+      top: -200px;
+      left: -150px;
+      animation: orbFloat 12s ease-in-out infinite;
+    }
+
+    .bg-orb-2 {
+      width: 500px;
+      height: 500px;
+      background: radial-gradient(circle, rgba(43,227,154,0.10) 0%, transparent 70%);
+      bottom: -150px;
+      right: -100px;
+      animation: orbFloat 16s ease-in-out infinite reverse;
+    }
+
+    .bg-orb-3 {
+      width: 300px;
+      height: 300px;
+      background: radial-gradient(circle, rgba(29,158,104,0.08) 0%, transparent 70%);
+      top: 50%;
+      left: 60%;
+      animation: orbFloat 10s ease-in-out infinite 4s;
+    }
+
+    @keyframes orbFloat {
+      0%, 100% { transform: translate(0, 0); }
+      33% { transform: translate(30px, -20px); }
+      66% { transform: translate(-20px, 30px); }
+    }
+
+    /* Grid de fondo sutil */
+    .bg-grid {
+      position: fixed;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(29,158,104,0.04) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(29,158,104,0.04) 1px, transparent 1px);
+      background-size: 60px 60px;
+      z-index: 0;
+      mask-image: radial-gradient(ellipse 80% 80% at 50% 50%, black 40%, transparent 100%);
+    }
+
+    /* Contenido */
+    .content {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 560px;
+      text-align: center;
+      animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) both;
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Logo */
+    .logo-wrap {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 52px;
+      animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.05s both;
+    }
+
+    .logo-icon {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #2BE39A 0%, #1D9E68 100%);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 8px 24px rgba(29,158,104,0.35);
+    }
+
+    .logo-icon svg {
+      width: 24px;
+      height: 24px;
+    }
+
+    .logo-text {
+      font-size: 24px;
+      font-weight: 600;
+      letter-spacing: -0.5px;
+    }
+
+    .logo-text span {
+      background: linear-gradient(135deg, #2BE39A 0%, #14A86F 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 800;
+    }
+
+    /* Badge estat */
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      background: var(--green-dim);
+      border: 1px solid var(--green-border);
+      border-radius: 999px;
+      padding: 6px 14px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--green-bright);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      font-family: 'DM Mono', monospace;
+      animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.1s both;
+    }
+
+    .status-dot {
+      width: 7px;
+      height: 7px;
+      background: var(--green-bright);
+      border-radius: 50%;
+      animation: pulse 2s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50% { opacity: 0.4; transform: scale(0.8); }
+    }
+
+    /* Heading */
+    h1 {
+      font-size: clamp(36px, 7vw, 58px);
+      font-weight: 300;
+      letter-spacing: -1.5px;
+      line-height: 1.08;
+      margin-bottom: 20px;
+      color: var(--text);
+      animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both;
+    }
+
+    h1 em {
+      font-style: normal;
+      background: linear-gradient(135deg, #2BE39A 0%, #14A86F 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-weight: 700;
+    }
+
+    .subtitle {
+      font-size: 16px;
+      color: var(--muted);
+      line-height: 1.6;
+      max-width: 420px;
+      margin: 0 auto 44px;
+      font-weight: 300;
+      animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.2s both;
+    }
+
+    /* Card de progreso */
+    .progress-card {
+      background: var(--card);
+      border: 1px solid rgba(29,158,104,0.15);
+      border-radius: 20px;
+      padding: 28px 28px 24px;
+      backdrop-filter: blur(12px);
+      margin-bottom: 32px;
+      text-align: left;
+      animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.25s both;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .progress-label {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-family: 'DM Mono', monospace;
+      margin-bottom: 14px;
+    }
+
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .feature {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--text);
+    }
+
+    .feature-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      font-size: 14px;
+      background: var(--green-dim);
+      border: 1px solid var(--green-border);
+    }
+
+    /* Contacte */
+    .contact-line {
+      font-size: 13px;
+      color: var(--muted);
+      animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both;
+    }
+
+    .contact-line a {
+      color: var(--green-bright);
+      text-decoration: none;
+      font-weight: 500;
+    }
+
+    .contact-line a:hover {
+      text-decoration: underline;
+    }
+
+    /* Línia decorativa */
+    .divider {
+      width: 48px;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--green), transparent);
+      margin: 28px auto;
+      animation: fadeUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.3s both;
+    }
+
+    @media (max-width: 480px) {
+      .progress-card { padding: 20px 18px; }
+      h1 { letter-spacing: -1px; }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="bg-orb bg-orb-1"></div>
+  <div class="bg-orb bg-orb-2"></div>
+  <div class="bg-orb bg-orb-3"></div>
+
+  <div class="content">
+
+    <div class="logo-wrap">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 2L4 6v6c0 5 3.6 9.7 8 11 4.4-1.3 8-6 8-11V6L12 2z" fill="white" fill-opacity="0.9"/>
+          <path d="M9 12l2 2 4-4" stroke="#1D9E68" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+      </div>
+      <div class="logo-text">Ad<span>Work</span></div>
+    </div>
+
+    <div class="status-badge">
+      <div class="status-dot"></div>
+      En desenvolupament
+    </div>
+
+    <h1>Estem preparant<br /><em>quelcom millor</em></h1>
+
+    <p class="subtitle">
+      La plataforma per connectar treballadors amb negocis d'Andorra està a punt. Tornem aviat.
+    </p>
+
+    <div class="progress-card">
+      <div class="progress-label">Què estem construint</div>
+      <div class="features">
+        <div class="feature">
+          <div class="feature-icon">💼</div>
+          Publicació de torns i extres per hores
+        </div>
+        <div class="feature">
+          <div class="feature-icon">🤝</div>
+          Connexió directa entre treballadors i negocis
+        </div>
+        <div class="feature">
+          <div class="feature-icon">📍</div>
+          Específic per a Andorra
+        </div>
+        <div class="feature">
+          <div class="feature-icon">⚡</div>
+          Disponibilitat en temps real
+        </div>
+      </div>
+    </div>
+
+    <div class="divider"></div>
+
+    <p class="contact-line">
+      Consultes: <a href="mailto:contacte@adwork.ad">contacte@adwork.ad</a>
+    </p>
+
+  </div>
+
+</body>
+</html>
