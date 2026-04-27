@@ -655,3 +655,124 @@ label{
   overflow-y: auto;
   padding-right: 4px;
 }
+
+.notifications-wrap{
+  position: relative;
+}
+
+.notifications-btn{
+  position: relative;
+  width: 38px;
+  height: 38px;
+  border-radius: 12px;
+
+  /* estilo AdWork */
+  border: 1px solid rgba(255,255,255,0.08);
+  background: rgba(20, 24, 23, 0.65);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: all .2s ease;
+}
+
+/* icono */
+.notifications-btn span,
+.notifications-btn{
+  color: var(--primary); 
+  font-size: 15px;
+}
+
+/* hover PRO */
+.notifications-btn:hover{
+  background: rgba(61,201,138,0.10);
+  border-color: rgba(61,201,138,0.25);
+}
+
+.notifications-badge{
+  position: absolute;
+  top: -4px;
+  right: -4px;
+
+  background: var(--primary);
+  color: #0b1f17;
+
+  font-size: 10px;
+  font-weight: 600;
+
+  border-radius: 50%;
+  padding: 2px 5px;
+
+  border: 2px solid #141817;
+}
+
+.notifications-panel{
+  position: absolute;
+  top: 56px;
+  right: 0;
+  width: 340px;
+  max-width: calc(100vw - 24px);
+  background: #121816;
+  border: 1px solid rgba(220,255,240,.12);
+  border-radius: 18px;
+  box-shadow: 0 20px 50px rgba(0,0,0,.35);
+  padding: 14px;
+  z-index: 50;
+}
+
+.notifications-head{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.notifications-head button{
+  border: 0;
+  background: transparent;
+  color: var(--primary);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.notifications-list{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  max-height: 360px;
+  overflow-y: auto;
+}
+
+.notification-item{
+  padding: 12px;
+  border: 1px solid rgba(220,255,240,.09);
+  border-radius: 14px;
+  background: rgba(255,255,255,.035);
+}
+
+.notification-item.unread{
+  border-color: rgba(29,158,104,.35);
+  background: rgba(29,158,104,.08);
+}
+
+.notification-item strong{
+  display: block;
+  margin-bottom: 4px;
+}
+
+.notification-item p{
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.hidden{
+  display: none !important;
+}
+.bell-icon{
+  display: inline-block;
+  transform: translateY(1px);
+}

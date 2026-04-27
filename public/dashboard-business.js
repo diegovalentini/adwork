@@ -161,6 +161,20 @@ const onboardingBtn = document.getElementById("onboardingBtn");
 const dateInput = document.getElementById("date");
 if (dateInput) dateInput.min = new Date().toISOString().split("T")[0];
 
+const notificationsBtn = document.getElementById("notificationsBtn");
+const notificationsPanel = document.getElementById("notificationsPanel");
+
+notificationsBtn?.addEventListener("click", (e) => {
+  e.stopPropagation();
+  notificationsPanel?.classList.toggle("hidden");
+});
+
+document.addEventListener("click", (e) => {
+  if (!e.target.closest(".notifications-wrap")) {
+    notificationsPanel?.classList.add("hidden");
+  }
+});
+
 /* =========================
    Spinner
 ========================= */

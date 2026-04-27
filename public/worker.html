@@ -41,6 +41,23 @@
               <button type="button" class="lang-option" data-lang="es">Español</button>
             </div>
           </div>
+          <div class="notifications-wrap">
+  <button id="notificationsBtn" class="icon-btn notifications-btn" type="button">
+    <span class="bell-icon">🔔</span>
+    <span id="notificationsBadge" class="notifications-badge hidden">0</span>
+  </button>
+
+  <div id="notificationsPanel" class="notifications-panel hidden">
+    <div class="notifications-head">
+      <strong>Notificaciones</strong>
+      <button id="markNotificationsReadBtn" type="button">Marcar leídas</button>
+    </div>
+
+    <div id="notificationsList" class="notifications-list">
+      <p class="muted">No tenés notificaciones.</p>
+    </div>
+  </div>
+</div>
           <button id="logoutBtn" class="logout-icon-btn" aria-label="Cerrar sesión">
             <img src="icons/salida.png" alt="Cerrar sesión" />
           </button>

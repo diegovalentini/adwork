@@ -2,6 +2,7 @@ import { auth, db } from "./firebase-config.js";
 import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
+  sendEmailVerification,
   sendPasswordResetEmail,
   onAuthStateChanged,
   signOut,
@@ -260,7 +261,19 @@ registerForm.addEventListener("submit", async (e) => {
       availableNow: false,
     });
 
-    showMessage(t("msg_account_created"), "success");
+   await sendEmailVerification(cred.user, {
+  url: "https://www.adwork.ad",
+});
+
+showMessage(
+  currentLanguage === "ca"
+    ? "Compte creat ✅ Revisa el teu correu i verifica l'email abans d'entrar."
+    : "Cuenta creada ✅ Revisa tu correo y verifica el email antes de entrar.",
+  "success"
+);
+
+await signOut(auth);
+setActiveTab("login");
   } catch (err) {
    console.error(err);
     showMessage(err.code ? `${err.code}: ${err.message}` : err.message, "error");
@@ -275,8 +288,23 @@ loginForm.addEventListener("submit", async (e) => {
   try {
     const email = loginEmail.value.trim();
     const pass = loginPassword.value;
-    await signInWithEmailAndPassword(auth, email, pass);
-    showMessage(t("msg_welcome"), "success");
+    const cred = await signInWithEmailAndPassword(auth, email, pass);
+await cred.user.reload();
+
+if (!cred.user.emailVerified) {
+  await sendEmailVerification(cred.user);
+  await signOut(auth);
+
+  showMessage(
+    currentLanguage === "ca"
+      ? "Encara no has verificat el teu email. T'hem enviat un nou correu de verificació."
+      : "Todavía no verificaste tu email. Te enviamos un nuevo correo de verificación.",
+    "error"
+  );
+  return;
+}
+
+showMessage(t("msg_welcome"), "success");
   } catch (err) {
   let text = t("msg_login_error");
 
@@ -326,6 +354,18 @@ resetBtn.addEventListener("click", async () => {
   if (!user) {
     afterLogin.classList.add("hidden");
     authCard.classList.remove("hidden");
+    return;
+  }
+    await user.reload();
+
+  if (!user.emailVerified) {
+    await signOut(auth);
+    showMessage(
+      currentLanguage === "ca"
+        ? "Verifica el teu email abans d'entrar."
+        : "Verifica tu email antes de entrar.",
+      "error"
+    );
     return;
   }
 
