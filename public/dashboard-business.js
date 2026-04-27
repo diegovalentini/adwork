@@ -142,6 +142,12 @@ const businessProfileMsg = document.getElementById("businessProfileMsg");
 const workersList = document.getElementById("workersList");
 const myJobsList = document.getElementById("myJobsList");
 const contactsList = document.getElementById("contactsList");
+const businessPanelTabs = document.querySelectorAll(".business-panel-tab");
+const businessPanelSections = {
+  history: document.getElementById("businessPanelHistory"),
+  workers: document.getElementById("businessPanelWorkers"),
+  contacts: document.getElementById("businessPanelContacts"),
+};
 const langToggle = document.getElementById("langToggle");
 const langMenu = document.getElementById("langMenu");
 const currentLang = document.getElementById("currentLang");
@@ -214,6 +220,30 @@ document.querySelectorAll(".lang-option").forEach((btn) => {
 document.addEventListener("click", (e) => {
   if (!e.target.closest(".lang-switcher")) langMenu?.classList.add("hidden");
 });
+
+/* =========================
+   Panel switcher business
+========================= */
+function showBusinessPanel(panel) {
+  Object.entries(businessPanelSections).forEach(([key, section]) => {
+    if (!section) return;
+    section.classList.toggle("active", key === panel);
+  });
+
+  businessPanelTabs.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.panel === panel);
+  });
+
+  localStorage.setItem("adwork_business_panel", panel);
+}
+
+businessPanelTabs.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    showBusinessPanel(btn.dataset.panel);
+  });
+});
+
+showBusinessPanel(localStorage.getItem("adwork_business_panel") || "history");
 
 /* =========================
    Onboarding
@@ -337,13 +367,19 @@ function renderMyJobs(jobs) {
 function renderWorkers(workers) {
   latestWorkers = workers || [];
   workersList.innerHTML = "";
-  if (!workers || !workers.length) {
+
+  // Filtrar workers que ya son contacto
+  const filtered = (workers || []).filter(w => !myContactWorkerIds.has(w.uid || w.id));
+
+  if (!filtered.length) {
     workersList.innerHTML = `<div class="meta">${tb("no_workers")}</div>`;
     return;
   }
-  workers.forEach((w) => {
+
+  filtered.forEach((w) => {
     const photo = w.photoUrl && w.photoUrl.trim() ? w.photoUrl : "icons/default-user.png";
     const workerId = w.uid || w.id;
+
     const el = document.createElement("div");
     el.className = "item";
     el.innerHTML = `
@@ -351,10 +387,9 @@ function renderWorkers(workers) {
         <div class="worker-top">
           <img class="worker-photo" src="${photo}" alt="${w.name || tb("worker_default")}" />
           <div class="worker-actions">
-            ${myContactWorkerIds.has(workerId)
-              ? `<button class="btn" disabled>${tb("already_contact")}</button>`
-              : `<button class="btn primary reqContactWorkerBtn" data-workeruid="${workerId}">${tb("request_contact")}</button>`
-            }
+            <button class="btn primary reqContactWorkerBtn" data-workeruid="${workerId}">
+              ${tb("request_contact")}
+            </button>
           </div>
         </div>
         <div class="worker-info">

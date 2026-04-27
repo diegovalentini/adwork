@@ -754,11 +754,25 @@ safeOn(profileForm, "submit", async (e) => {
   }
 });
 
+function isProfileComplete(profile) {
+  return !!(profile.name && profile.location && profile.bio && profile.availableDays?.length);
+}
+
 /* =========================
    Toggle disponible
 ========================= */
 safeOn(toggleAvail, "click", async () => {
   if (!currentUid) return;
+  
+  const snap = await getDoc(doc(db, "users", currentUid));
+  const profile = snap.exists() ? snap.data() : {};
+  
+  if (!isProfileComplete(profile)) {
+    alert(tw("complete_profile_first"));
+    openProfileModal(); 
+    return;
+  }
+  
   currentAvailable = !currentAvailable;
   setAvailUI(currentAvailable);
   await updateDoc(doc(db, "users", currentUid), { availableNow: currentAvailable });

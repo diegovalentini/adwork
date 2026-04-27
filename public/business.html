@@ -125,19 +125,41 @@
           <div class="list" id="myJobsList"></div>
         </section>
 
-        <section class="card">
-          <h3 data-i18n="history">Historial</h3>
-          <div class="list" id="businessHistoryList"></div>
-        </section>
+        <section class="card business-switch-card">
+          <div class="business-panel-tabs">
+            <button type="button" class="business-panel-tab active" data-panel="history">
+              ☰ <span data-i18n="history">Historial</span>
+            </button>
+            <button type="button" class="business-panel-tab" data-panel="workers">
+              👤 <span data-i18n="available_workers">Treballadors disponibles</span>
+            </button>
+            <button type="button" class="business-panel-tab" data-panel="contacts">
+              💬 <span data-i18n="contacts">Contactes</span>
+            </button>
+          </div>
 
-        <section class="card">
-          <h3 data-i18n="available_workers">Treballadors disponibles</h3>
-          <div class="list" id="workersList"></div>
-        </section>
+          <div class="business-panel-content">
+            <section id="businessPanelHistory" class="business-panel-section active">
+              <div class="panel-title-row">
+                <h3 data-i18n="history">Historial</h3>
+              </div>
+              <div class="list" id="businessHistoryList"></div>
+            </section>
 
-        <section class="card">
-          <h3 data-i18n="contacts">Contactes</h3>
-          <div class="list" id="contactsList"></div>
+            <section id="businessPanelWorkers" class="business-panel-section">
+              <div class="panel-title-row">
+                <h3 data-i18n="available_workers">Treballadors disponibles</h3>
+              </div>
+              <div class="list" id="workersList"></div>
+            </section>
+
+            <section id="businessPanelContacts" class="business-panel-section">
+              <div class="panel-title-row">
+                <h3 data-i18n="contacts">Contactes</h3>
+              </div>
+              <div class="list" id="contactsList"></div>
+            </section>
+          </div>
         </section>
       </div>
     </div>

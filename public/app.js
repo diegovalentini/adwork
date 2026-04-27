@@ -241,6 +241,8 @@ registerForm.addEventListener("submit", async (e) => {
     const cred = await createUserWithEmailAndPassword(auth, email, pass);
     const uid = cred.user.uid;
     const isBusiness = role === "business";
+
+
     // Guardamos perfil básico en Firestore
     await setDoc(doc(db, "users", uid), {
       uid,
@@ -255,6 +257,7 @@ registerForm.addEventListener("submit", async (e) => {
       // ratings
       ratingAvg: 0,
       ratingCount: 0,
+      availableNow: false,
     });
 
     showMessage(t("msg_account_created"), "success");

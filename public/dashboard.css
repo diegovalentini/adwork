@@ -467,3 +467,98 @@ label{
   .worker-info .title{ font-size: 15px; line-height: 1.2; }
   .worker-info .sub{ font-size: 12px; line-height: 1.4; }
 }
+
+/* =========================
+   Business panel switcher
+========================= */
+
+.business-switch-card{
+  grid-column: 1 / -1;
+  min-height: 360px;
+  max-height: none;
+}
+
+.business-panel-tabs{
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin-bottom: 14px;
+  padding: 6px;
+  border-radius: 16px;
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(220,255,240,0.08);
+}
+
+.business-panel-tab{
+  border: 1px solid rgba(220,255,240,0.10);
+  background: rgba(255,255,255,0.04);
+  color: var(--text);
+  border-radius: 13px;
+  padding: 10px 12px;
+  cursor: pointer;
+  font-weight: 800;
+  font-family: inherit;
+  transition: transform .15s ease, background .15s ease, border-color .15s ease;
+}
+
+.business-panel-tab:hover{
+  transform: translateY(-1px);
+  border-color: rgba(29,158,104,0.35);
+}
+
+.business-panel-tab.active{
+  background: linear-gradient(135deg, #1FA56D 0%, #188E5E 100%);
+  color: #fff;
+  border-color: rgba(29,158,104,0.45);
+  box-shadow: 0 8px 22px rgba(29,158,104,0.18);
+}
+
+.business-panel-content{
+  border: 1px solid rgba(220,255,240,0.08);
+  border-radius: 16px;
+  background: rgba(255,255,255,0.025);
+  padding: 14px;
+  min-height: 300px;
+}
+
+.business-panel-section{
+  display: none;
+}
+
+.business-panel-section.active{
+  display: flex;
+  flex-direction: column;
+  min-height: 280px;
+}
+
+.business-panel-section .list{
+  max-height: 430px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.panel-title-row{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.panel-title-row h3{
+  margin: 0;
+}
+
+@media (max-width: 720px){
+  .business-panel-tabs{
+    flex-direction: column;
+  }
+
+  .business-panel-tab{
+    width: 100%;
+    text-align: left;
+  }
+
+  .business-panel-section .list{
+    max-height: 520px;
+  }
+}
