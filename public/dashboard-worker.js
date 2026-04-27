@@ -250,6 +250,37 @@ const onboardingTitle = $("onboardingTitle");
 const onboardingText = $("onboardingText");
 const onboardingBtn = $("onboardingBtn");
 const dayChks = Array.from(document.querySelectorAll(".dayChk"));
+const workerPanelTabs = document.querySelectorAll(".worker-panel-tab");
+const workerPanelSections = {
+  jobs: document.getElementById("workerPanelJobs"),
+  applications: document.getElementById("workerPanelApplications"),
+  shared: document.getElementById("workerPanelShared"),
+  history: document.getElementById("workerPanelHistory"),
+};
+
+/* =========================
+   Panel switcher worker
+========================= */
+function showWorkerPanel(panel) {
+  Object.entries(workerPanelSections).forEach(([key, section]) => {
+    if (!section) return;
+    section.classList.toggle("active", key === panel);
+  });
+
+  workerPanelTabs.forEach((btn) => {
+    btn.classList.toggle("active", btn.dataset.panel === panel);
+  });
+
+  localStorage.setItem("adwork_worker_panel", panel);
+}
+
+workerPanelTabs.forEach((btn) => {
+  btn.addEventListener("click", () => {
+    showWorkerPanel(btn.dataset.panel);
+  });
+});
+
+showWorkerPanel(localStorage.getItem("adwork_worker_panel") || "jobs");
 
 /* =========================
    Spinner helpers

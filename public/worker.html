@@ -76,30 +76,56 @@
             </div>
           </div>
         </section>
-
-        <section class="card">
+        <section class="card worker-contact-requests-card">
           <h3 data-i18n="worker_contact_requests">Sol·licituds de contacte</h3>
           <div class="list" id="contactReqList"></div>
         </section>
 
-        <section class="card">
-          <h3 data-i18n="worker_available_jobs">Torns disponibles</h3>
-          <div class="list" id="jobsList"></div>
-        </section>
+        <section class="card worker-switch-card">
+          <div class="worker-panel-tabs">
+            <button type="button" class="worker-panel-tab" data-panel="jobs">
+              📢 <span data-i18n="worker_available_jobs">Torns disponibles</span>
+            </button>
+            <button type="button" class="worker-panel-tab" data-panel="applications">
+              ✅ <span data-i18n="worker_my_applications">Les meves postulacions</span>
+            </button>
+            <button type="button" class="worker-panel-tab" data-panel="shared">
+              📇 <span data-i18n="worker_shared_contacts">Contactes compartits</span>
+            </button>
+            <button type="button" class="worker-panel-tab" data-panel="history">
+              ☰ <span data-i18n="common_history">Historial</span>
+            </button>
+          </div>
 
-        <section class="card">
-          <h3 data-i18n="worker_my_applications">Les meves postulacions</h3>
-          <div class="list" id="myAppsList"></div>
-        </section>
+          <div class="worker-panel-content">
+            <section id="workerPanelJobs" class="worker-panel-section">
+              <div class="panel-title-row">
+                <h3 data-i18n="worker_available_jobs">Torns disponibles</h3>
+              </div>
+              <div class="list" id="jobsList"></div>
+            </section>
 
-        <section class="card">
-          <h3 data-i18n="worker_shared_contacts">Contactes compartits</h3>
-          <div class="list" id="sharedContactsList"></div>
-        </section>
+            <section id="workerPanelApplications" class="worker-panel-section">
+              <div class="panel-title-row">
+                <h3 data-i18n="worker_my_applications">Les meves postulacions</h3>
+              </div>
+              <div class="list" id="myAppsList"></div>
+            </section>
 
-        <section class="card">
-          <h3 data-i18n="common_history">Historial</h3>
-          <div class="list" id="workerHistoryList"></div>
+            <section id="workerPanelShared" class="worker-panel-section">
+              <div class="panel-title-row">
+                <h3 data-i18n="worker_shared_contacts">Contactes compartits</h3>
+              </div>
+              <div class="list" id="sharedContactsList"></div>
+            </section>
+
+            <section id="workerPanelHistory" class="worker-panel-section">
+              <div class="panel-title-row">
+                <h3 data-i18n="common_history">Historial</h3>
+              </div>
+              <div class="list" id="workerHistoryList"></div>
+            </section>
+          </div>
         </section>
       </div>
     </div>
