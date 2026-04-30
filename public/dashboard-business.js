@@ -3,7 +3,7 @@ import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/
 
 import {
   doc, getDoc, setDoc, updateDoc, deleteDoc, addDoc, getDocs,
-  collection, query, where, orderBy, onSnapshot, serverTimestamp,
+  collection, query, where, orderBy, limit, writeBatch, onSnapshot, serverTimestamp,
 } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 /* =========================
@@ -163,6 +163,9 @@ if (dateInput) dateInput.min = new Date().toISOString().split("T")[0];
 
 const notificationsBtn = document.getElementById("notificationsBtn");
 const notificationsPanel = document.getElementById("notificationsPanel");
+const notificationsBadge = document.getElementById("notificationsBadge");
+const notificationsList = document.getElementById("notificationsList");
+const markNotificationsReadBtn = document.getElementById("markNotificationsReadBtn");
 
 notificationsBtn?.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -174,6 +177,89 @@ document.addEventListener("click", (e) => {
     notificationsPanel?.classList.add("hidden");
   }
 });
+
+markNotificationsReadBtn?.addEventListener("click", async () => {
+  await markNotificationsAsRead();
+});
+
+let unsubscribeNotifications = null;
+let currentNotifications = [];
+
+function startNotificationsListener(uid) {
+  if (!uid || !notificationsList) return;
+
+  if (unsubscribeNotifications) {
+    unsubscribeNotifications();
+    unsubscribeNotifications = null;
+  }
+
+    const q = query(
+      collection(db, "notifications"),
+      where("userUid", "==", uid),
+      limit(20)
+    );
+
+    unsubscribeNotifications = onSnapshot(q, (snapshot) => {
+    currentNotifications = snapshot.docs
+  .map((docSnap) => ({
+    id: docSnap.id,
+    ...docSnap.data(),
+  }))
+  .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+    renderNotifications();
+  }, (error) => {
+    console.error("Error escuchando notificaciones:", error);
+  });
+}
+
+function renderNotifications() {
+  if (!notificationsList) return;
+
+  const unreadCount = currentNotifications.filter((n) => !n.read).length;
+
+  if (notificationsBadge) {
+    notificationsBadge.textContent = "!";
+    notificationsBadge.classList.toggle("hidden", unreadCount === 0);
+  }
+
+  if (!currentNotifications.length) {
+    notificationsList.innerHTML = `<p class="muted">No tenés notificaciones.</p>`;
+    return;
+  }
+
+  notificationsList.innerHTML = currentNotifications.map((n) => {
+    const title = n.title || "Notificación";
+    const message = n.message || "";
+    const unreadClass = n.read ? "" : "unread";
+
+    return `
+      <div class="notification-item ${unreadClass}">
+        <strong>${title}</strong>
+        <p>${message}</p>
+      </div>
+    `;
+  }).join("");
+}
+
+async function markNotificationsAsRead() {
+  const unread = currentNotifications.filter((n) => !n.read);
+
+  if (!unread.length) return;
+
+  try {
+    const batch = writeBatch(db);
+
+    unread.forEach((n) => {
+      const ref = doc(db, "notifications", n.id);
+      batch.update(ref, { read: true });
+    });
+
+    await batch.commit();
+  } catch (error) {
+    console.error("Error marcando notificaciones como leídas:", error);
+  }
+}
 
 /* =========================
    Spinner
@@ -519,6 +605,8 @@ onAuthStateChanged(auth, async (user) => {
   businessUid = user.uid;
   showSpinner();
 
+  startNotificationsListener(user.uid);
+
   try {
     const snap = await getDoc(doc(db, "users", user.uid));
     const profile = snap.exists() ? snap.data() : {};
@@ -591,6 +679,10 @@ if (roleSelect && otherRoleContainer) {
    Logout
 ========================= */
 logoutBtn.addEventListener("click", async () => {
+  if (unsubscribeNotifications) {
+  unsubscribeNotifications();
+  unsubscribeNotifications = null;
+}
   await signOut(auth);
   window.location.href = "./index.html";
 });

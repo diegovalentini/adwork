@@ -12,7 +12,7 @@ admin.initializeApp();
 
 const RESEND_API_KEY = defineSecret("RESEND_API_KEY");
 
-const TEST_MODE = true;
+const TEST_MODE = false;
 const TEST_EMAIL = "diegu.v1@gmail.com";
 
 exports.helloWorld = onRequest((req, res) => {
@@ -114,6 +114,17 @@ exports.onNewApplication = onDocumentCreated(
       }
 
       console.log("Email enviado correctamente:", result.data);
+      await db.collection("notifications").add({
+        userUid: businessUid,
+        role: "business",
+        type: "new_application",
+        title: "Nuevo postulante",
+        message: `${workerName} se postuló a tu turno de ${jobRole}.`,
+        read: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      console.log("Notificación creada para la empresa");
     } catch (error) {
       console.error("Error en onNewApplication:", error);
     }
@@ -127,7 +138,6 @@ exports.onContactRequestWritten = onDocumentWritten(
     secrets: [RESEND_API_KEY],
   },
   async (event) => {
-const beforeSnap = event.data?.before;
 const afterSnap = event.data?.after;
 
 // Si se borró el doc, no hacemos nada
@@ -238,6 +248,17 @@ if (requestData.status !== "pending") {
       }
 
       console.log("Email al worker enviado correctamente:", result.data);
+      await db.collection("notifications").add({
+        userUid: workerUid,
+        role: "worker",
+        type: "contact_request",
+        title: "Solicitud de contacto",
+        message: `${companyName} quiere contactarte en AdWork.`,
+        read: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      console.log("Notificación creada para el worker");
     } catch (error) {
       console.error("Error en onContactRequestWritten:", error);
     }
