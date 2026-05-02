@@ -71,8 +71,14 @@ const businessTranslations = {
     notif_contact_shared_message: "{workerName} ha compartit el seu contacte amb tu.",
     notif_contact_declined_title: "Sol·licitud rebutjada",
     notif_contact_declined_message: "{workerName} ha rebutjat compartir el seu contacte.",
+    status_open: "Obert",
+    status_closed: "Tancat",
+    status_filled: "Cobert",
   },
   es: {
+    status_open: "Abierto",
+    status_closed: "Cerrado",
+    status_filled: "Cubierto",
     notif_contact_request_title: "Solicitud de contacto",
     notif_contact_request_message: "{companyName} quiere contactarte en AdWork.",
     notif_contact_shared_title: "Contacto compartido",
@@ -269,7 +275,6 @@ function showConfirm(message) {
 
 async function clearAllNotifications() {
   if (!currentNotifications.length) return;
-  // tw() en worker, tb() en business
   const ok = await showConfirm(tb("notif_confirm_clear"));
   if (!ok) return;
   try {
@@ -394,6 +399,7 @@ function applyBusinessTranslations() {
   renderBusinessHistory(latestBusinessHistory);
   renderWorkers(latestWorkers);
   renderContacts(latestSharedContacts);
+  renderNotifications();
 }
 
 langToggle?.addEventListener("click", (e) => { e.stopPropagation(); langMenu?.classList.toggle("hidden"); });
@@ -418,9 +424,7 @@ document.addEventListener("click", (e) => {
   if (!e.target.closest(".lang-switcher")) langMenu?.classList.add("hidden");
 });
 
-/* =========================
-   Panel switcher business
-========================= */
+
 function showBusinessPanel(panel) {
   Object.entries(businessPanelSections).forEach(([key, section]) => {
     if (!section) return;
@@ -442,9 +446,6 @@ businessPanelTabs.forEach((btn) => {
 
 showBusinessPanel(localStorage.getItem("adwork_business_panel") || "history");
 
-/* =========================
-   Onboarding
-========================= */
 function checkOnboarding(profile) {
   if (!onboardingBanner) return;
   const isIncomplete = !profile.companyName || !profile.companyLocation;
@@ -461,9 +462,6 @@ if (onboardingBtn) {
   });
 }
 
-/* =========================
-   State
-========================= */
 let businessUid = null;
 let myContactWorkerIds = new Set();
 let currentJobId = null;
@@ -534,6 +532,13 @@ function renderBusinessProfile(profile) {
   bRating.textContent = `⭐ ${profile.ratingAvg || 0} (${profile.ratingCount || 0})`;
 }
 
+function formatJobStatus(status) {
+  if (status === "open") return tb("status_open");
+  if (status === "closed") return tb("status_closed");
+  if (status === "filled") return tb("status_filled");
+  return tb("status_open");
+}
+
 function renderMyJobs(jobs) {
   latestBusinessJobs = jobs || [];
   myJobsList.innerHTML = "";
@@ -549,7 +554,7 @@ function renderMyJobs(jobs) {
       <div class="sub">📅 ${formatDateEU(j.date)}</div>
       <div class="sub">🕒 ${formatHourRange(j.from, j.to)}</div>
       <div class="sub">💶 €${j.pay ?? ""}/h</div>
-      <div class="sub">${tb("status_label")} ${j.status || "open"}</div>
+      <div class="sub">${tb("status_label")} ${formatJobStatus(j.status)}</div>
       ${j.notes ? `<div class="sub">📝 ${j.notes}</div>` : ""}
       <div class="row" style="margin-top:10px; gap:10px;">
         <button class="btn primary" data-action="apps" data-id="${j.id}">${tb("applicants_btn")}</button>
@@ -565,7 +570,6 @@ function renderWorkers(workers) {
   latestWorkers = workers || [];
   workersList.innerHTML = "";
 
-  // Filtrar workers que ya son contacto
   const filtered = (workers || []).filter(w => !myContactWorkerIds.has(w.uid || w.id));
 
   if (!filtered.length) {
@@ -613,7 +617,6 @@ async function renderContacts(contacts) {
     return;
   }
 
-  // Deduplicar por workerUid — quedamos con el más reciente
   const seen = new Map();
   for (const item of contacts) {
     const wid = item.data.workerUid;
@@ -682,9 +685,7 @@ function renderBusinessHistory(items) {
   });
 }
 
-/* =========================
-   Snapshot global workers
-========================= */
+
 const qWorkers = query(collection(db, "users"), where("role", "==", "worker"), where("availableNow", "==", true));
 onSnapshot(qWorkers, (snap) => {
   latestWorkers = snap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -694,9 +695,7 @@ onSnapshot(qWorkers, (snap) => {
   if (workersList) workersList.innerHTML = `<div class="meta error">${tb("error_loading")}</div>`;
 });
 
-/* =========================
-   Auth
-========================= */
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) return (window.location.href = "./index.html");
   businessUid = user.uid;
@@ -762,9 +761,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-/* =========================
-   Select puesto "otros"
-========================= */
+
 const roleSelect = document.getElementById("role");
 const otherRoleContainer = document.getElementById("otherRoleContainer");
 const otherRoleInput = document.getElementById("otherRole");
@@ -824,9 +821,7 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
-/* =========================
-   Guardar perfil empresa
-========================= */
+
 businessProfileForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   if (!businessUid) return;
@@ -850,9 +845,7 @@ businessProfileForm.addEventListener("submit", async (e) => {
   }
 });
 
-/* =========================
-   Clicks Mis turnos
-========================= */
+
 myJobsList.addEventListener("click", async (e) => {
   const btn = e.target.closest("button[data-action]");
   if (!btn) return;
@@ -942,9 +935,7 @@ myJobsList.addEventListener("click", async (e) => {
   }
 });
 
-/* =========================
-   Aceptar postulante
-========================= */
+
 appsModalList.addEventListener("click", async (e) => {
   const btn = e.target.closest(".acceptBtn");
   if (!btn) return;
@@ -954,7 +945,7 @@ appsModalList.addEventListener("click", async (e) => {
   btn.disabled = true;
   btn.textContent = tb("accepting");
   try {
-    await updateDoc(doc(db, "jobs", jobId), { status: "filled", assignedWorkerUid: workerUid, filledAt: serverTimestamp() });
+    await updateDoc(doc(db, "jobs", jobId), {assignedWorkerUid: workerUid, acceptedAt: serverTimestamp(), });
     const qAll = query(collection(db, "applications"), where("jobId", "==", jobId));
     const allSnap = await getDocs(qAll);
     for (const a of allSnap.docs) {

@@ -465,10 +465,6 @@ label{
   .worker-info .sub{ font-size: 12px; line-height: 1.4; }
 }
 
-/* =========================
-   Business panel switcher
-========================= */
-
 .business-switch-card{
   grid-column: 1 / -1;
   min-height: 360px;
@@ -559,10 +555,6 @@ label{
     max-height: 520px;
   }
 }
-
-/* =========================
-   Worker panel switcher
-========================= */
 
 .worker-switch-card{
   grid-column: 1 / -1;

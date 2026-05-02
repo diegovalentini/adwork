@@ -22,9 +22,7 @@ import {
 import { storage } from "./firebase-config.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-storage.js";
 
-/* =========================
-   Helpers
-========================= */
+
 function $(id) { return document.getElementById(id); }
 function safeText(el, value) { if (el) el.textContent = value; }
 function safeHTML(el, value) { if (el) el.innerHTML = value; }
@@ -33,9 +31,7 @@ function safeAddClass(el, cls) { if (el) el.classList.add(cls); }
 function safeRemoveClass(el, cls) { if (el) el.classList.remove(cls); }
 function safeOn(el, evt, fn) { if (el) el.addEventListener(evt, fn); }
 
-/* =========================
-   Traducciones
-========================= */
+
 const workerTranslations = {
   ca: {
     worker_toggle_status: "Canviar estat",
@@ -223,18 +219,14 @@ function tw(key) {
   return workerTranslations[lang]?.[key] || key;
 }
 
-/* =========================
-   State
-========================= */
+
 let myAppliedJobIds = new Set();
 let currentUid = null;
 let currentAvailable = false;
 let latestJobs = [];
 let currentWorkerName = "";
 
-/* =========================
-   DOM
-========================= */
+
 const who = $("who");
 const availabilityBadge = $("availabilityBadge");
 const toggleAvail = $("toggleAvail");
@@ -371,7 +363,6 @@ function showConfirm(message) {
 
 async function clearAllNotifications() {
   if (!currentNotifications.length) return;
-  // tw() en worker, tb() en business
   const ok = await showConfirm(tw("notif_confirm_clear"));
   if (!ok) return;
   try {
@@ -385,7 +376,6 @@ async function clearAllNotifications() {
   }
 }
 
-// Añade este listener junto a los otros de notificaciones:
 document.getElementById("clearAllNotificationsBtn")
   ?.addEventListener("click", clearAllNotifications);
 
@@ -411,7 +401,6 @@ function renderNotifications() {
 
   if (!currentNotifications.length) {
     notificationsList.innerHTML = `<p class="muted">${tw("notif_none")}</p>`;
-    // en business.js usar tb() en vez de tw()
     return;
   }
 
@@ -460,9 +449,6 @@ async function markNotificationsAsRead() {
   }
 }
 
-/* =========================
-   Panel switcher worker
-========================= */
 function showWorkerPanel(panel) {
   Object.entries(workerPanelSections).forEach(([key, section]) => {
     if (!section) return;
@@ -484,9 +470,7 @@ workerPanelTabs.forEach((btn) => {
 
 showWorkerPanel(localStorage.getItem("adwork_worker_panel") || "jobs");
 
-/* =========================
-   Spinner helpers
-========================= */
+
 function showSpinner() {
   if (appSpinner) appSpinner.classList.remove("hidden");
   if (appContent) appContent.classList.add("hidden");
@@ -496,9 +480,7 @@ function hideSpinner() {
   if (appContent) appContent.classList.remove("hidden");
 }
 
-/* =========================
-   Formato
-========================= */
+
 function formatDateEU(dateStr) {
   if (!dateStr) return "";
   const parts = dateStr.split("-");
@@ -511,9 +493,7 @@ function formatHourRange(from, to) {
   return `${from || ""} - ${to || ""}`;
 }
 
-/* =========================
-   Traducciones estáticas
-========================= */
+
 function applyWorkerTranslations() {
   const lang = getWorkerLang();
   document.documentElement.lang = lang;
@@ -532,11 +512,9 @@ function applyWorkerTranslations() {
 
   setAvailUI(currentAvailable);
   rerenderLists();
+  renderNotifications();
 }
 
-/* =========================
-   Selector idioma
-========================= */
 safeOn(langToggle, "click", (e) => {
   e.stopPropagation();
   langMenu?.classList.toggle("hidden");
@@ -565,9 +543,7 @@ document.addEventListener("click", (e) => {
 
 applyWorkerTranslations();
 
-/* =========================
-   Onboarding
-========================= */
+
 function checkOnboarding(profile) {
   if (!onboardingBanner) return;
   const isIncomplete = !profile.name || !profile.location || !profile.bio || !profile.availableDays?.length;
@@ -583,9 +559,7 @@ safeOn(onboardingBtn, "click", () => {
   if (onboardingBanner) onboardingBanner.classList.add("hidden");
 });
 
-/* =========================
-   Contacto modal
-========================= */
+
 function openShareModal(reqId) {
   shareReqId.value = reqId;
   shareWhatsapp.value = "";
@@ -606,18 +580,14 @@ document.addEventListener("keydown", (e) => {
   if (e.key === "Escape") { closeShareModal(); closeProfileModal(); }
 });
 
-/* =========================
-   Días checkboxes
-========================= */
+
 function getSelectedDays() { return dayChks.filter((c) => c.checked).map((c) => c.value); }
 function setSelectedDays(days = []) {
   const set = new Set(days);
   dayChks.forEach((c) => (c.checked = set.has(c.value)));
 }
 
-/* =========================
-   UI disponibilidad
-========================= */
+
 function setAvailUI(isAvailable) {
   if (!availabilityBadge) return;
   if (isAvailable) {
@@ -631,18 +601,13 @@ function setAvailUI(isAvailable) {
   }
 }
 
-/* =========================
-   Modal perfil
-========================= */
+
 function openProfileModal() { safeRemoveClass(editProfileModal, "hidden"); }
 function closeProfileModal() { safeAddClass(editProfileModal, "hidden"); }
 safeOn(openEditProfile, "click", openProfileModal);
 safeOn(closeEditProfile, "click", closeProfileModal);
 safeOn(editProfileModal, "click", (e) => { if (e.target === editProfileModal) closeProfileModal(); });
 
-/* =========================
-   Render: Turnos disponibles
-========================= */
 function renderAvailableJobs(jobs) {
   if (!jobsList) return;
   jobsList.innerHTML = "";
@@ -668,9 +633,7 @@ function renderAvailableJobs(jobs) {
   });
 }
 
-/* =========================
-   Render: Mis postulaciones
-========================= */
+
 function renderMyApplications(jobs) {
   if (!myAppsList) return;
   myAppsList.innerHTML = "";
@@ -702,9 +665,7 @@ function rerenderLists() {
   renderMyApplications(latestJobs);
 }
 
-/* =========================
-   Postularme
-========================= */
+
 safeOn(jobsList, "click", async (e) => {
   const btn = e.target.closest(".applyBtn");
   if (!btn) return;
@@ -729,9 +690,6 @@ safeOn(jobsList, "click", async (e) => {
   }
 });
 
-/* =========================
-   Despostularme
-========================= */
 myAppsList.addEventListener("click", async (e) => {
   const btn = e.target.closest(".withdrawBtn");
   if (!btn) return;
@@ -753,9 +711,7 @@ myAppsList.addEventListener("click", async (e) => {
   }
 });
 
-/* =========================
-   Preview foto
-========================= */
+
 safeOn(editPhotoFile, "change", () => {
   const file = editPhotoFile.files?.[0];
   if (!file) return;
@@ -763,9 +719,7 @@ safeOn(editPhotoFile, "change", () => {
   safeText(uploadHint, `${tw("selected_file")} ${file.name}`);
 });
 
-/* =========================
-   AUTH + Load data
-========================= */
+
 onAuthStateChanged(auth, async (user) => {
   if (!user) return (window.location.href = "./index.html");
   currentUid = user.uid;
@@ -809,9 +763,6 @@ onAuthStateChanged(auth, async (user) => {
     checkOnboarding(profile);
     hideSpinner();
 
-    /* --- Snapshots --- */
-
-    // Historial worker (worker_history)
     const qWHist = query(collection(db, "worker_history"), where("workerUid", "==", currentUid));
     onSnapshot(qWHist, (histSnap) => {
       if (!workerHistoryList) return;
@@ -836,7 +787,6 @@ onAuthStateChanged(auth, async (user) => {
       if (workerHistoryList) workerHistoryList.innerHTML = `<div class="meta error">${tw("error_loading")}</div>`;
     });
 
-    // Contactos compartidos por el worker
     const qShared = query(
       collection(db, "contact_requests"),
       where("workerUid", "==", currentUid),
@@ -884,7 +834,6 @@ onAuthStateChanged(auth, async (user) => {
       if (sharedContactsList) sharedContactsList.innerHTML = `<div class="meta error">${tw("error_loading")}</div>`;
     });
 
-    // Mis postulaciones
     const qMyApps = query(collection(db, "applications"), where("workerUid", "==", currentUid));
     onSnapshot(qMyApps, (appsSnap) => {
       myAppliedJobIds = new Set(appsSnap.docs.map((d) => d.data().jobId));
@@ -894,7 +843,6 @@ onAuthStateChanged(auth, async (user) => {
       if (myAppsList) myAppsList.innerHTML = `<div class="meta error">${tw("error_loading")}</div>`;
     });
 
-    // Jobs abiertos
     const qJobs = query(collection(db, "jobs"), where("status", "==", "open"));
     onSnapshot(qJobs, (jobsSnap) => {
       latestJobs = jobsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
@@ -905,7 +853,7 @@ onAuthStateChanged(auth, async (user) => {
       if (jobsList) jobsList.innerHTML = `<div class="meta error">${tw("error_loading")}</div>`;
     });
 
-    // Solicitudes de contacto pendientes
+ 
     const qReq = query(
       collection(db, "contact_requests"),
       where("workerUid", "==", currentUid),
@@ -958,9 +906,7 @@ onAuthStateChanged(auth, async (user) => {
   }
 });
 
-/* =========================
-   Guardar perfil
-========================= */
+
 safeOn(profileForm, "submit", async (e) => {
   e.preventDefault();
   if (!currentUid) return;
@@ -1006,9 +952,7 @@ function isProfileComplete(profile) {
   return !!(profile.name && profile.location && profile.bio && profile.availableDays?.length);
 }
 
-/* =========================
-   Toggle disponible
-========================= */
+
 safeOn(toggleAvail, "click", async () => {
   if (!currentUid) return;
   
@@ -1026,9 +970,7 @@ safeOn(toggleAvail, "click", async () => {
   await updateDoc(doc(db, "users", currentUid), { availableNow: currentAvailable });
 });
 
-/* =========================
-   Logout
-========================= */
+
 safeOn(logoutBtn, "click", async () => {
   if (unsubscribeNotifications) {
   unsubscribeNotifications();
@@ -1038,9 +980,7 @@ safeOn(logoutBtn, "click", async () => {
   window.location.href = "./index.html";
 });
 
-/* =========================
-   Click contactReqList
-========================= */
+
 contactReqList.addEventListener("click", async (e) => {
   const shareBtn = e.target.closest(".shareContactBtn");
   const declineBtn = e.target.closest(".declineContactBtn");
@@ -1053,9 +993,7 @@ contactReqList.addEventListener("click", async (e) => {
   }
 });
 
-/* =========================
-   Eliminar contacto compartido (worker)
-========================= */
+
 if (sharedContactsList) {
   sharedContactsList.addEventListener("click", async (e) => {
     const btn = e.target.closest(".deleteSharedContactBtn");
@@ -1076,9 +1014,7 @@ if (sharedContactsList) {
   });
 }
 
-/* =========================
-   Formulario compartir contacto
-========================= */
+
 if (shareContactForm) {
   shareContactForm.addEventListener("submit", async (e) => {
     e.preventDefault();

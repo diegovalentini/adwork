@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /worker.html
+Disallow: /business.html
+Sitemap: https://adwork.ad/sitemap.xml

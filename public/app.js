@@ -243,19 +243,15 @@ registerForm.addEventListener("submit", async (e) => {
     const uid = cred.user.uid;
     const isBusiness = role === "business";
 
-
-    // Guardamos perfil básico en Firestore
     await setDoc(doc(db, "users", uid), {
       uid,
       name,
       email,
       role, 
       createdAt: serverTimestamp(),
-      // solo negocio:
       companyName: isBusiness ? regCompanyName.value.trim() : null,
       companyType: isBusiness ? regCompanyType.value : null,
       companyLocation: isBusiness ? regCompanyLocation.value.trim() : null,
-      // ratings
       ratingAvg: 0,
       ratingCount: 0,
       availableNow: false,
@@ -280,7 +276,6 @@ setActiveTab("login");
   }
 });
 
-// LOGIN
 loginForm.addEventListener("submit", async (e) => {
   e.preventDefault();
   showMessage(t("msg_logging_in"), "info");
@@ -326,7 +321,6 @@ showMessage(t("msg_welcome"), "success");
 
 });
 
-// RESET PASSWORD
 resetBtn.addEventListener("click", async () => {
   const email = loginEmail.value.trim();
   if (!email) return showMessage(t("msg_write_email_for_reset"), "error");
@@ -347,7 +341,6 @@ resetBtn.addEventListener("click", async () => {
 }
 });
 
-// AUTH STATE
   onAuthStateChanged(auth, async (user) => {
   const authCard = document.getElementById("authCard");
 
@@ -369,19 +362,16 @@ resetBtn.addEventListener("click", async () => {
     return;
   }
 
-  // leer perfil
   const snap = await getDoc(doc(db, "users", user.uid));
   const profile = snap.exists() ? snap.data() : null;
 
   if (!profile?.role) {
-    // Si por alguna razón no existe perfil, no lo dejamos colgado
     userInfo.textContent = `Usuario: ${user.email} — Rol: ?`;
     afterLogin.classList.remove("hidden");
     authCard.classList.add("hidden");
     return;
   }
 
-  // Redirigir según rol
   if (profile.role === "worker") {
     window.location.href = "./worker.html";
   } else if (profile.role === "business") {
@@ -403,8 +393,6 @@ logoutBtn.addEventListener("click", async () => {
 regRole.addEventListener("change", () => {
   const isBusiness = regRole.value === "business";
   businessFields.classList.toggle("hidden", !isBusiness);
-
-  // si no es negocio, limpiamos
   if (!isBusiness) {
     regCompanyName.value = "";
     regCompanyLocation.value = "";
