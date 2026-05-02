@@ -52,13 +52,16 @@
 </button>
 
   <div id="notificationsPanel" class="notifications-panel hidden">
-    <div class="notifications-head">
-      <strong>Notificaciones</strong>
-      <button id="markNotificationsReadBtn" type="button">Marcar leídas</button>
-    </div>
+      <div class="notifications-head">
+        <strong data-i18n="notif_title">Notificacions</strong>
+        <div style="display:flex; gap:8px;">
+          <button id="markNotificationsReadBtn" type="button" data-i18n="notif_mark_read">Marcar com llegides</button>
+          <button id="clearAllNotificationsBtn" type="button" data-i18n="notif_clear_all">Eliminar totes</button>
+        </div>
+      </div>
 
     <div id="notificationsList" class="notifications-list">
-      <p class="muted">No tenés notificaciones.</p>
+      <p class="muted" data-i18n="notifications_empty"></p>
     </div>
   </div>
 </div>
@@ -242,6 +245,17 @@
       </div>
       <div data-i18n="footer_contact">© 2026 AdWork · contacte@adwork.ad</div>
     </footer>
+
+    <!-- Modal confirmación -->
+    <div id="confirmModal" class="modalOverlay hidden">
+      <div class="card confirmCard">
+        <p id="confirmModalText" class="confirmText"></p>
+        <div class="row" style="gap:10px; justify-content:flex-end; margin-top:4px;">
+          <button id="confirmModalCancel" class="btn">Cancelar</button>
+          <button id="confirmModalAccept" class="btn danger">Eliminar</button>
+        </div>
+      </div>
+    </div>
   </div>
 
   <script type="module" src="firebase-config.js"></script>

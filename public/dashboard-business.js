@@ -58,8 +58,34 @@ const businessTranslations = {
     onboarding_text: "Completa el perfil de la teva empresa i publica el primer torn per trobar treballadors.",
     onboarding_btn: "Completar perfil",
     error_loading: "Error en carregar les dades. Comprova la connexió.",
+    notif_title: "Notificacions",
+    notif_mark_read: "Marcar com llegides",
+    notif_clear_all: "Eliminar totes",
+    notif_confirm_clear: "Vols eliminar totes les notificacions?",
+    notif_none: "No tens notificacions.",
+    notif_new_application_title: "Nou postulant",
+    notif_new_application_message: "{workerName} s'ha postulat al teu torn de {jobRole}.",
+    notif_contact_request_title: "Sol·licitud de contacte",
+    notif_contact_request_message: "{companyName} vol contactar amb tu a AdWork.",
+    notif_contact_shared_title: "Contacte compartit",
+    notif_contact_shared_message: "{workerName} ha compartit el seu contacte amb tu.",
+    notif_contact_declined_title: "Sol·licitud rebutjada",
+    notif_contact_declined_message: "{workerName} ha rebutjat compartir el seu contacte.",
   },
   es: {
+    notif_contact_request_title: "Solicitud de contacto",
+    notif_contact_request_message: "{companyName} quiere contactarte en AdWork.",
+    notif_contact_shared_title: "Contacto compartido",
+    notif_contact_shared_message: "{workerName} compartió su contacto contigo.",
+    notif_contact_declined_title: "Solicitud rechazada",
+    notif_contact_declined_message: "{workerName} rechazó compartir su contacto.",
+    notif_new_application_title: "Nuevo postulante",
+    notif_new_application_message: "{workerName} se postuló a tu turno de {jobRole}.",
+    notif_title: "Notificaciones",
+    notif_mark_read: "Marcar leídas",
+    notif_clear_all: "Eliminar todas",
+    notif_confirm_clear: "¿Eliminar todas las notificaciones?",
+    notif_none: "No tenés notificaciones.",
     loading: "Cargando...", business_panel: "Panel Negocio", logout: "Salir",
     my_company: "Mi empresa", edit: "Editar",
     no_type: "🏷️ (sin rubro)", no_location: "📍 (sin locación)",
@@ -114,7 +140,7 @@ function getBusinessLang() { return localStorage.getItem("adwork_lang") || "ca";
 function tb(key) { return businessTranslations[getBusinessLang()]?.[key] || key; }
 
 /* =========================
-   DOM
+    DOM
 ========================= */
 const openEditCompany = document.getElementById("openEditCompany");
 const editCompanyModal = document.getElementById("editCompanyModal");
@@ -213,33 +239,95 @@ function startNotificationsListener(uid) {
   });
 }
 
+function showConfirm(message) {
+  return new Promise((resolve) => {
+    const modal = document.getElementById("confirmModal");
+    const text = document.getElementById("confirmModalText");
+    const acceptBtn = document.getElementById("confirmModalAccept");
+    const cancelBtn = document.getElementById("confirmModalCancel");
+
+    text.textContent = message;
+    modal.classList.remove("hidden");
+
+    function cleanup(result) {
+      modal.classList.add("hidden");
+      acceptBtn.removeEventListener("click", onAccept);
+      cancelBtn.removeEventListener("click", onCancel);
+      modal.removeEventListener("click", onOverlay);
+      resolve(result);
+    }
+
+    const onAccept  = () => cleanup(true);
+    const onCancel  = () => cleanup(false);
+    const onOverlay = (e) => { if (e.target === modal) cleanup(false); };
+
+    acceptBtn.addEventListener("click", onAccept);
+    cancelBtn.addEventListener("click", onCancel);
+    modal.addEventListener("click", onOverlay);
+  });
+}
+
+async function clearAllNotifications() {
+  if (!currentNotifications.length) return;
+  // tw() en worker, tb() en business
+  const ok = await showConfirm(tb("notif_confirm_clear"));
+  if (!ok) return;
+  try {
+    const batch = writeBatch(db);
+    currentNotifications.forEach((n) => {
+      batch.delete(doc(db, "notifications", n.id));
+    });
+    await batch.commit();
+  } catch (err) {
+    console.error(err);
+  }
+}
+document.getElementById("clearAllNotificationsBtn")
+  ?.addEventListener("click", clearAllNotifications);
+
+
+function formatNotificationText(key, vars = {}) {
+  let text = tb(key);
+
+  Object.entries(vars || {}).forEach(([name, value]) => {
+    text = text.replaceAll(`{${name}}`, value ?? "");
+  });
+
+  return text;
+}
+
 function renderNotifications() {
   if (!notificationsList) return;
-
   const unreadCount = currentNotifications.filter((n) => !n.read).length;
-
   if (notificationsBadge) {
-    notificationsBadge.textContent = "!";
     notificationsBadge.classList.toggle("hidden", unreadCount === 0);
   }
-
   if (!currentNotifications.length) {
-    notificationsList.innerHTML = `<p class="muted">No tenés notificaciones.</p>`;
+    notificationsList.innerHTML = `<p class="muted">${tb("notif_none")}</p>`;   
     return;
   }
-
-  notificationsList.innerHTML = currentNotifications.map((n) => {
-    const title = n.title || "Notificación";
-    const message = n.message || "";
-    const unreadClass = n.read ? "" : "unread";
-
-    return `
-      <div class="notification-item ${unreadClass}">
-        <strong>${title}</strong>
-        <p>${message}</p>
-      </div>
-    `;
-  }).join("");
+  notificationsList.innerHTML = currentNotifications.map((n) => `
+    <div class="notification-item ${n.read ? "" : "unread"}" data-id="${n.id}">
+      <button class="notif-delete-btn" data-id="${n.id}" aria-label="Eliminar">✕</button>
+      <strong>
+        ${n.titleKey ? formatNotificationText(n.titleKey, n.vars) : (n.title || "Notificació")}
+      </strong>
+      <p>
+        ${n.messageKey ? formatNotificationText(n.messageKey, n.vars) : (n.message || "")}
+      </p>
+    </div>
+  `).join("");
+  notificationsList.querySelectorAll(".notif-delete-btn").forEach((btn) => {
+    btn.addEventListener("click", async (e) => {
+      e.stopPropagation();
+      const id = btn.dataset.id;
+      try {
+        await deleteDoc(doc(db, "notifications", id));
+      } catch (err) {
+        console.error(err);
+      }
+    });
+  });
 }
 
 async function markNotificationsAsRead() {
@@ -310,9 +398,18 @@ function applyBusinessTranslations() {
 
 langToggle?.addEventListener("click", (e) => { e.stopPropagation(); langMenu?.classList.toggle("hidden"); });
 document.querySelectorAll(".lang-option").forEach((btn) => {
-  btn.addEventListener("click", (e) => {
+  btn.addEventListener("click", async (e) => {
     e.stopPropagation();
-    localStorage.setItem("adwork_lang", btn.dataset.lang);
+
+    const lang = btn.dataset.lang;
+    localStorage.setItem("adwork_lang", lang);
+
+    if (auth.currentUser) {
+      await updateDoc(doc(db, "users", auth.currentUser.uid), {
+        lang,
+      });
+    }
+
     langMenu?.classList.add("hidden");
     applyBusinessTranslations();
   });
@@ -603,6 +700,10 @@ onSnapshot(qWorkers, (snap) => {
 onAuthStateChanged(auth, async (user) => {
   if (!user) return (window.location.href = "./index.html");
   businessUid = user.uid;
+  await updateDoc(doc(db, "users", user.uid), {
+  lang: localStorage.getItem("adwork_lang") || "ca",
+});
+
   showSpinner();
 
   startNotificationsListener(user.uid);
@@ -834,7 +935,8 @@ myJobsList.addEventListener("click", async (e) => {
     return;
   }
   if (action === "delete") {
-    if (!confirm(tb("delete_shift_confirm"))) return;
+      const ok = await showConfirm(tb("delete_shift_confirm"));
+  if (!ok) return;
     await deleteDoc(doc(db, "jobs", id));
     return;
   }
@@ -920,7 +1022,8 @@ contactsList?.addEventListener("click", async (e) => {
   if (!btn) return;
   const id = btn.dataset.id;
   if (!id) return;
-  if (!confirm(tb("delete_contact_confirm"))) return;
+    const ok = await showConfirm(tb("delete_contact_confirm"));
+  if (!ok) return;
   btn.disabled = true;
   btn.textContent = tb("deleting");
   try {

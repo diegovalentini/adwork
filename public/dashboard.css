@@ -822,3 +822,47 @@ label{
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+
+.notif-delete-btn {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 20px;
+  height: 20px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,255,255,0.10);
+  background: rgba(255,255,255,0.06);
+  color: var(--muted);
+  font-size: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+  line-height: 1;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.notif-delete-btn:hover {
+  background: rgba(255,77,79,0.18);
+  border-color: rgba(255,77,79,0.35);
+  color: #ffd6d6;
+}
+
+.notification-item {
+  position: relative;
+  padding-right: 32px; 
+}
+
+.confirmCard {
+  width: min(360px, 90vw);
+  max-height: none;
+  padding: 22px;
+}
+
+.confirmText {
+  margin: 0 0 16px;
+  font-size: 15px;
+  color: var(--text);
+  line-height: 1.5;
+}
