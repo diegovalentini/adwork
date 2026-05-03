@@ -74,8 +74,10 @@ const businessTranslations = {
     status_open: "Obert",
     status_closed: "Tancat",
     status_filled: "Cobert",
+    open_btn: "Obrir",
   },
   es: {
+    open_btn: "Abrir",
     status_open: "Abierto",
     status_closed: "Cerrado",
     status_filled: "Cubierto",
@@ -170,6 +172,7 @@ const editCompanyName = document.getElementById("editCompanyName");
 const editCompanyType = document.getElementById("editCompanyType");
 const editCompanyLocation = document.getElementById("editCompanyLocation");
 const editCompanyBio = document.getElementById("editCompanyBio");
+const companyBioCounter = document.getElementById("companyBioCounter");
 const businessProfileMsg = document.getElementById("businessProfileMsg");
 const workersList = document.getElementById("workersList");
 const myJobsList = document.getElementById("myJobsList");
@@ -244,6 +247,13 @@ function startNotificationsListener(uid) {
     console.error("Error escuchando notificaciones:", error);
   });
 }
+
+function updateCompanyBioCounter() {
+  if (!editCompanyBio || !companyBioCounter) return;
+  companyBioCounter.textContent = `${editCompanyBio.value.length}/100`;
+}
+editCompanyBio?.addEventListener("input", updateCompanyBioCounter);
+
 
 function showConfirm(message) {
   return new Promise((resolve) => {
@@ -523,14 +533,20 @@ function renderBusinessProfile(profile) {
     bCompanyName.textContent = "—";
     bCompanyType.textContent = tb("no_type");
     bCompanyLocation.textContent = tb("no_location");
-    bRating.textContent = "⭐ 0 (0)";
+    if (bRating) bRating.textContent = "";
     return;
   }
   bCompanyName.textContent = profile.companyName || "—";
   bCompanyType.textContent = profile.companyType ? `🏷️ ${profile.companyType}` : tb("no_type");
   bCompanyLocation.textContent = profile.companyLocation ? `📍 ${profile.companyLocation}` : tb("no_location");
-  bRating.textContent = `⭐ ${profile.ratingAvg || 0} (${profile.ratingCount || 0})`;
-}
+    const bCompanyBio = document.getElementById("bCompanyBio");
+    const bio = profile.companyBio || "";
+
+    if (bCompanyBio) {
+      bCompanyBio.textContent = bio ? `📝 ${bio}` : "";
+    }
+    if (bRating) bRating.textContent = "";
+  }
 
 function formatJobStatus(status) {
   if (status === "open") return tb("status_open");
@@ -558,7 +574,11 @@ function renderMyJobs(jobs) {
       ${j.notes ? `<div class="sub">📝 ${j.notes}</div>` : ""}
       <div class="row" style="margin-top:10px; gap:10px;">
         <button class="btn primary" data-action="apps" data-id="${j.id}">${tb("applicants_btn")}</button>
-        <button class="btn" data-action="close" data-id="${j.id}">${tb("close_btn")}</button>
+                ${
+          j.status === "closed"
+            ? `<button class="btn primary" data-action="open" data-id="${j.id}">${tb("open_btn")}</button>`
+            : `<button class="btn" data-action="close" data-id="${j.id}">${tb("close_btn")}</button>`
+        }
         <button class="btn danger" data-action="delete" data-id="${j.id}">${tb("delete_btn")}</button>
       </div>
     `;
@@ -720,6 +740,7 @@ onAuthStateChanged(auth, async (user) => {
     editCompanyType.value = profile.companyType || "hotel";
     editCompanyLocation.value = profile.companyLocation || "";
     editCompanyBio.value = profile.companyBio || "";
+    updateCompanyBioCounter();
 
     checkOnboarding(profile);
     hideSpinner();
@@ -734,15 +755,22 @@ onAuthStateChanged(auth, async (user) => {
       if (contactsList) contactsList.innerHTML = `<div class="meta error">${tb("error_loading")}</div>`;
     });
 
-    // Mis jobs
-    const qJobs = query(collection(db, "jobs"), where("businessUid", "==", businessUid), orderBy("createdAt", "desc"));
-    onSnapshot(qJobs, (jobsSnap) => {
-      latestBusinessJobs = jobsSnap.docs.map((d) => ({ id: d.id, ...d.data() }));
-      renderMyJobs(latestBusinessJobs);
-    }, (err) => {
-      console.error(err);
-      if (myJobsList) myJobsList.innerHTML = `<div class="meta error">${tb("error_loading")}</div>`;
-    });
+   // Mis jobs
+const qJobs = query(
+  collection(db, "jobs"),
+  where("businessUid", "==", businessUid)
+);
+
+onSnapshot(qJobs, (jobsSnap) => {
+  latestBusinessJobs = jobsSnap.docs
+    .map((d) => ({ id: d.id, ...d.data() }))
+    .sort((a, b) => (b.createdAt?.seconds || 0) - (a.createdAt?.seconds || 0));
+
+  renderMyJobs(latestBusinessJobs);
+}, (err) => {
+  console.error("Error cargando mis turnos:", err);
+  if (myJobsList) myJobsList.innerHTML = `<div class="meta error">${tb("error_loading")}</div>`;
+});
 
     // Historial
     const qHist = query(collection(db, "business_history"), where("businessUid", "==", businessUid));
@@ -831,7 +859,7 @@ businessProfileForm.addEventListener("submit", async (e) => {
       companyName: editCompanyName.value.trim(),
       companyType: editCompanyType.value,
       companyLocation: editCompanyLocation.value.trim(),
-      companyBio: editCompanyBio.value.trim(),
+      companyBio: editCompanyBio.value.trim().slice(0, 100),
     };
     await updateDoc(doc(db, "users", businessUid), payload);
     latestBusinessProfile = { ...(latestBusinessProfile || {}), ...payload };
@@ -927,11 +955,20 @@ myJobsList.addEventListener("click", async (e) => {
     await updateDoc(doc(db, "jobs", id), { status: "closed", closedAt: serverTimestamp() });
     return;
   }
-  if (action === "delete") {
-      const ok = await showConfirm(tb("delete_shift_confirm"));
-  if (!ok) return;
-    await deleteDoc(doc(db, "jobs", id));
+
+    if (action === "open") {
+    await updateDoc(doc(db, "jobs", id), {
+      status: "open",
+      reopenedAt: serverTimestamp(),
+    });
     return;
+  }
+  
+    if (action === "delete") {
+        const ok = await showConfirm(tb("delete_shift_confirm"));
+    if (!ok) return;
+      await deleteDoc(doc(db, "jobs", id));
+      return;
   }
 });
 

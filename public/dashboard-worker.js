@@ -480,6 +480,19 @@ function hideSpinner() {
   if (appContent) appContent.classList.remove("hidden");
 }
 
+function isJobStillAvailable(job) {
+  if (!job?.date) return false;
+
+  const now = new Date();
+
+  // Si tiene hora de fin, usamos esa hora.
+  // Si no tiene, usamos 23:59 para que dure todo el día.
+  const endTime = job.to || "23:59";
+
+  const endDateTime = new Date(`${job.date}T${endTime}:00`);
+
+  return endDateTime > now;
+}
 
 function formatDateEU(dateStr) {
   if (!dateStr) return "";
@@ -611,7 +624,10 @@ safeOn(editProfileModal, "click", (e) => { if (e.target === editProfileModal) cl
 function renderAvailableJobs(jobs) {
   if (!jobsList) return;
   jobsList.innerHTML = "";
-  const available = jobs.filter(j => !myAppliedJobIds.has(j.id));
+  const available = jobs.filter(j =>
+  !myAppliedJobIds.has(j.id) &&
+  isJobStillAvailable(j)
+);
   if (!available.length) {
     jobsList.innerHTML = `<div class="meta">${tw("no_available_jobs")}</div>`;
     return;
@@ -834,14 +850,19 @@ onAuthStateChanged(auth, async (user) => {
       if (sharedContactsList) sharedContactsList.innerHTML = `<div class="meta error">${tw("error_loading")}</div>`;
     });
 
-    const qMyApps = query(collection(db, "applications"), where("workerUid", "==", currentUid));
-    onSnapshot(qMyApps, (appsSnap) => {
-      myAppliedJobIds = new Set(appsSnap.docs.map((d) => d.data().jobId));
-      rerenderLists();
-    }, (err) => {
-      console.error(err);
-      if (myAppsList) myAppsList.innerHTML = `<div class="meta error">${tw("error_loading")}</div>`;
-    });
+      const qMyApps = query(collection(db, "applications"), where("workerUid", "==", currentUid));
+      onSnapshot(qMyApps, (appsSnap) => {
+        const activeApplications = appsSnap.docs
+          .map((d) => d.data())
+          .filter((app) => (app.status || "applied") === "applied");
+      
+        myAppliedJobIds = new Set(activeApplications.map((app) => app.jobId));
+      
+        rerenderLists();
+      }, (err) => {
+        console.error(err);
+        if (myAppsList) myAppsList.innerHTML = `<div class="meta error">${tw("error_loading")}</div>`;
+      });
 
     const qJobs = query(collection(db, "jobs"), where("status", "==", "open"));
     onSnapshot(qJobs, (jobsSnap) => {

@@ -98,7 +98,8 @@
           <div class="title" id="bCompanyName">—</div>
           <div class="sub" id="bCompanyType">—</div>
           <div class="sub" id="bCompanyLocation">—</div>
-          <div class="sub" id="bRating">—</div>
+          <div class="sub company-bio-preview" id="bCompanyBio"></div>
+         <!-- <div class="sub" id="bRating">—</div> -->
         </div>
       </section>
 
@@ -227,7 +228,8 @@
           </label>
           <label>
             <span data-i18n="label_description">Descripció (opcional)</span>
-            <textarea id="editCompanyBio" placeholder="Ex: Hotel 4* al centre..."></textarea>
+            <textarea id="editCompanyBio" maxlength="100" placeholder="Ex: Hotel 4* al centre..."></textarea>
+            <div id="companyBioCounter" class="meta">0/100</div>
           </label>
           <button class="btn primary" type="submit" data-i18n="btn_save">Desar</button>
           <div id="businessProfileMsg" class="meta"></div>
