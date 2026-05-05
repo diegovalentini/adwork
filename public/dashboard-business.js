@@ -75,8 +75,16 @@ const businessTranslations = {
     status_closed: "Tancat",
     status_filled: "Cobert",
     open_btn: "Obrir",
+    reject_btn: "Rebutjar",
+    rejecting: "Rebutjant...",
+    rejected: "Rebutjat ✅",
+    reject_application_confirm: "Vols rebutjar aquesta postulació?",
   },
   es: {
+    reject_application_confirm: "¿Querés rechazar esta postulación?",
+    reject_btn: "Rechazar",
+    rejecting: "Rechazando...",
+    rejected: "Rechazado ✅",
     open_btn: "Abrir",
     status_open: "Abierto",
     status_closed: "Cerrado",
@@ -916,8 +924,21 @@ myJobsList.addEventListener("click", async (e) => {
               <div class="sub">⏰ ${u.availableHours || tb("no_hours")}</div>
               <div class="contactBox" style="margin-top:10px;"></div>
               <div class="row actionsRow" style="margin-top:10px; gap:10px;">
-                ${appStatus === "applied" ? `<button class="btn primary acceptBtn" data-jobid="${currentJobId}" data-workeruid="${a.workerUid}">${tb("accept_btn")}</button>` : ""}
-                <span class="badge on">${appStatus === "accepted" ? tb("status_accepted") : appStatus === "rejected" ? tb("status_rejected") : tb("status_applied")}</span>
+              ${
+                appStatus === "applied"
+                  ? `
+                    <button class="btn primary acceptBtn" data-appid="${d.id}" data-jobid="${currentJobId}" data-workeruid="${a.workerUid}">
+                      ${tb("accept_btn")}
+                    </button>
+                    <button class="btn danger rejectBtn" data-appid="${d.id}" data-jobid="${currentJobId}" data-workeruid="${a.workerUid}">
+                      ${tb("reject_btn")}
+                    </button>
+                  `
+                  : ""
+              }
+              <span class="badge ${appStatus === "rejected" ? "off" : "on"}">
+                ${appStatus === "accepted" ? tb("status_accepted") : appStatus === "rejected" ? tb("status_rejected") : tb("status_applied")}
+              </span>
               </div>
             </div>
           </div>
@@ -978,15 +999,17 @@ appsModalList.addEventListener("click", async (e) => {
   if (!btn) return;
   const jobId = btn.dataset.jobid;
   const workerUid = btn.dataset.workeruid;
+  const appId = btn.dataset.appid;
   if (!jobId || !workerUid) return;
   btn.disabled = true;
   btn.textContent = tb("accepting");
   try {
     await updateDoc(doc(db, "jobs", jobId), {assignedWorkerUid: workerUid, acceptedAt: serverTimestamp(), });
-    const qAll = query(collection(db, "applications"), where("jobId", "==", jobId));
-    const allSnap = await getDocs(qAll);
-    for (const a of allSnap.docs) {
-      if (a.data().workerUid === workerUid) await updateDoc(doc(db, "applications", a.id), { status: "accepted" });
+    if (appId) {
+      await updateDoc(doc(db, "applications", appId), {
+        status: "accepted",
+        acceptedAt: serverTimestamp(),
+      });
     }
     const requestId = `${jobId}_${workerUid}`;
     await setDoc(doc(db, "contact_requests", requestId), {
@@ -1013,6 +1036,35 @@ appsModalList.addEventListener("click", async (e) => {
     alert(err.message);
   }
 });
+
+appsModalList.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".rejectBtn");
+  if (!btn) return;
+
+  const appId = btn.dataset.appid;
+  if (!appId) return;
+
+  const ok = await showConfirm(tb("reject_application_confirm"));
+  if (!ok) return;
+
+  btn.disabled = true;
+  btn.textContent = tb("rejecting");
+
+  try {
+    await updateDoc(doc(db, "applications", appId), {
+      status: "rejected",
+      rejectedAt: serverTimestamp(),
+    });
+
+    btn.textContent = tb("rejected");
+  } catch (err) {
+    console.error(err);
+    btn.disabled = false;
+    btn.textContent = tb("reject_btn");
+    alert(err.message);
+  }
+});
+
 
 /* =========================
    Solicitar contacto directo

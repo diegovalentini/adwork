@@ -253,6 +253,80 @@ exports.onNewApplication = onDocumentCreated(
   }
 );
 
+exports.onApplicationWritten = onDocumentWritten(
+  {
+    document: "applications/{appId}",
+    region: "us-central1",
+    secrets: [RESEND_API_KEY],
+  },
+  async (event) => {
+    const beforeSnap = event.data?.before;
+    const afterSnap = event.data?.after;
+
+    if (!afterSnap || !afterSnap.exists) return;
+
+    const before = beforeSnap?.exists ? beforeSnap.data() : null;
+    const after = afterSnap.data();
+
+    const beforeStatus = before?.status || null;
+    const afterStatus = after.status || "applied";
+
+    if (beforeStatus === afterStatus) return;
+
+    if (afterStatus !== "rejected") return;
+
+    const db = admin.firestore();
+
+    try {
+      const { workerUid, jobId } = after;
+
+      if (!workerUid || !jobId) {
+        console.log("Faltan workerUid o jobId en application rejected");
+        return;
+      }
+
+      const jobSnap = await db.collection("jobs").doc(jobId).get();
+      if (!jobSnap.exists) {
+        console.log("No existe job para rechazo:", jobId);
+        return;
+      }
+
+      const job = jobSnap.data();
+      const businessUid = job.businessUid;
+
+      let companyName = "Una empresa";
+
+      if (businessUid) {
+        const businessSnap = await db.collection("users").doc(businessUid).get();
+        if (businessSnap.exists) {
+          const business = businessSnap.data();
+          companyName = business.companyName || business.name || companyName;
+        }
+      }
+
+      const jobRole = job.role || "turno";
+
+      await db.collection("notifications").add({
+        userUid: workerUid,
+        role: "worker",
+        type: "application_rejected",
+        titleKey: "notif_application_rejected_title",
+        messageKey: "notif_application_rejected_message",
+        vars: {
+          companyName,
+          jobRole,
+        },
+        read: false,
+        createdAt: admin.firestore.FieldValue.serverTimestamp(),
+      });
+
+      console.log("Notificación de rechazo creada para worker");
+    } catch (error) {
+      console.error("Error en onApplicationWritten:", error);
+    }
+  }
+);
+
 exports.onContactRequestWritten = onDocumentWritten(
   {
     document: "contact_requests/{requestId}",

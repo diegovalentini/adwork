@@ -121,8 +121,12 @@ const workerTranslations = {
     notif_contact_shared_message: "{workerName} ha compartit el seu contacte amb tu.",
     notif_contact_declined_title: "Sol·licitud rebutjada",
     notif_contact_declined_message: "{workerName} ha rebutjat compartir el seu contacte.",
+    notif_application_rejected_title: "Postulació rebutjada",
+    notif_application_rejected_message: "{companyName} ha rebutjat la teva postulació per al torn de {jobRole}.",
   },
   es: {
+    notif_application_rejected_title: "Postulación rechazada",
+    notif_application_rejected_message: "{companyName} rechazó tu postulación para el turno de {jobRole}.",
     notif_contact_request_title: "Solicitud de contacto",
     notif_contact_request_message: "{companyName} quiere contactarte en AdWork.",
     notif_contact_shared_title: "Contacto compartido",
