@@ -123,8 +123,10 @@ const workerTranslations = {
     notif_contact_declined_message: "{workerName} ha rebutjat compartir el seu contacte.",
     notif_application_rejected_title: "Postulació rebutjada",
     notif_application_rejected_message: "{companyName} ha rebutjat la teva postulació per al torn de {jobRole}.",
+    notifications_empty: "No tens notificacions.",
   },
   es: {
+    notifications_empty: "No tenés notificaciones.",
     notif_application_rejected_title: "Postulación rechazada",
     notif_application_rejected_message: "{companyName} rechazó tu postulación para el turno de {jobRole}.",
     notif_contact_request_title: "Solicitud de contacto",
@@ -320,7 +322,6 @@ function startNotificationsListener(uid) {
     const q = query(
       collection(db, "notifications"),
       where("userUid", "==", uid),
-      limit(20)
     );
 
     unsubscribeNotifications = onSnapshot(q, (snapshot) => {
@@ -689,24 +690,29 @@ function rerenderLists() {
 safeOn(jobsList, "click", async (e) => {
   const btn = e.target.closest(".applyBtn");
   if (!btn) return;
-  if (!currentUid) return alert(tw("no_session"));
+  if (!currentUid) {showConfirm(tw("no_session")); 
+    return;
+  }
   const jobId = btn.dataset.jobid;
   if (!jobId) return;
   if (myAppliedJobIds.has(jobId)) { btn.disabled = true; btn.textContent = tw("applied"); return; }
   btn.disabled = true;
   btn.textContent = tw("applying");
   try {
-    await addDoc(collection(db, "applications"), {
-      jobId, workerUid: currentUid, createdAt: serverTimestamp(),
-      status: "applied", workerName: currentWorkerName || tw("worker_default_name"),
-    });
+      const appId = `${jobId}_${currentUid}`;
+      await setDoc(doc(db, "applications", appId), {
+        jobId, workerUid: currentUid, createdAt: serverTimestamp(),
+        status: "applied", workerName: currentWorkerName || tw("worker_default_name"),
+      });
     myAppliedJobIds.add(jobId);
     btn.textContent = tw("applied");
   } catch (err) {
     console.error(err);
     btn.disabled = false;
     btn.textContent = tw("apply");
-    alert(err.message);
+    btn.closest(".item")?.insertAdjacentHTML("beforeend",
+    `<div class="meta error" style="margin-top:6px;">${tw("error_loading")}</div>`
+    );
   }
 });
 
@@ -727,7 +733,9 @@ myAppsList.addEventListener("click", async (e) => {
     console.error(err);
     btn.disabled = false;
     btn.textContent = tw("withdraw");
-    alert(err.message);
+        btn.closest(".item")?.insertAdjacentHTML("beforeend",
+      `<div class="meta error" style="margin-top:6px;">${tw("error_loading")}</div>`
+    );
   }
 });
 

@@ -79,8 +79,10 @@ const businessTranslations = {
     rejecting: "Rebutjant...",
     rejected: "Rebutjat ✅",
     reject_application_confirm: "Vols rebutjar aquesta postulació?",
+    notifications_empty: "No tens notificacions.",
   },
   es: {
+    notifications_empty: "No tenés notificaciones.",
     reject_application_confirm: "¿Querés rechazar esta postulación?",
     reject_btn: "Rechazar",
     rejecting: "Rechazando...",
@@ -1033,7 +1035,9 @@ appsModalList.addEventListener("click", async (e) => {
     console.error(err);
     btn.disabled = false;
     btn.textContent = tb("accept_btn");
-    alert(err.message);
+      btn.closest(".item")?.insertAdjacentHTML("beforeend",
+      `<div class="meta error" style="margin-top:6px;">${tb("error_loading")}</div>`
+    );
   }
 });
 
@@ -1061,7 +1065,9 @@ appsModalList.addEventListener("click", async (e) => {
     console.error(err);
     btn.disabled = false;
     btn.textContent = tb("reject_btn");
-    alert(err.message);
+      btn.closest(".item")?.insertAdjacentHTML("beforeend",
+      `<div class="meta error" style="margin-top:6px;">${tb("error_loading")}</div>`
+    );
   }
 });
 
@@ -1074,8 +1080,8 @@ workersList.addEventListener("click", async (e) => {
   if (!btn) return;
   const workerUid = btn.dataset.workeruid?.trim();
   const businessUidNow = auth.currentUser?.uid;
-  if (!workerUid) { alert(tb("workeruid_error")); return; }
-  if (!businessUidNow) { alert(tb("session_error")); return; }
+  if (!workerUid) {await showConfirm(tb("workeruid_error")); return; }
+  if (!businessUidNow) { await showConfirm(tb("session_error")); return; }
   btn.disabled = true;
   const prevText = btn.textContent;
   btn.textContent = tb("sending");
