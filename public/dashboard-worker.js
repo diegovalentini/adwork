@@ -124,8 +124,34 @@ const workerTranslations = {
     notif_application_rejected_title: "Postulació rebutjada",
     notif_application_rejected_message: "{companyName} ha rebutjat la teva postulació per al torn de {jobRole}.",
     notifications_empty: "No tens notificacions.",
+    filter_btn: "Filtrar",
+    filter_all_roles: "Tots els llocs",
+    filter_all_days: "Tots els dies",
+    filter_zone_placeholder: "Zona...",
+    filter_role_placeholder: "Lloc (ex: cambrer)...",
+    day_mon: "Dl", day_tue: "Dm", day_wed: "Dc", day_thu: "Dj",
+    day_fri: "Dv", day_sat: "Ds", day_sun: "Dg",
+    pos_waiter: "Cambrer",
+    pos_kitchen: "Cuina",
+    pos_cleaning: "Neteja",
+    pos_reception: "Recepció",
+    pos_pica: "Pica",
+    pos_other: "Altres",
   },
   es: {
+    pos_waiter: "Camarero",
+    pos_kitchen: "Cocina",
+    pos_cleaning: "Limpieza",
+    pos_reception: "Recepción",
+    pos_pica: "Pica",
+    pos_other: "Otros",
+    filter_btn: "Filtrar",
+    filter_all_roles: "Todos los puestos",
+    filter_all_days: "Todos los días",
+    filter_zone_placeholder: "Zona...",
+    filter_role_placeholder: "Puesto (ej: camarero)...",
+    day_mon: "Lu", day_tue: "Ma", day_wed: "Mi", day_thu: "Ju",
+    day_fri: "Vi", day_sat: "Sá", day_sun: "Do",
     notifications_empty: "No tenés notificaciones.",
     notif_application_rejected_title: "Postulación rechazada",
     notif_application_rejected_message: "{companyName} rechazó tu postulación para el turno de {jobRole}.",
@@ -286,7 +312,10 @@ const workerPanelSections = {
   shared: document.getElementById("workerPanelShared"),
   history: document.getElementById("workerPanelHistory"),
 };
-
+const filterJobRole = document.getElementById("filterJobRole");
+const filterJobZone = document.getElementById("filterJobZone");
+const filterJobDate = document.getElementById("filterJobDate");
+const clearJobsFilter = document.getElementById("clearJobsFilter");
 const notificationsBtn = document.getElementById("notificationsBtn");
 const notificationsPanel = document.getElementById("notificationsPanel");
 const notificationsBadge = document.getElementById("notificationsBadge");
@@ -518,11 +547,32 @@ function applyWorkerTranslations() {
   document.title = tw("page_title");
   if (currentLang) currentLang.textContent = lang.toUpperCase();
 
+  const filterJobZoneEl = document.getElementById("filterJobZone");
+  if (filterJobZoneEl) filterJobZoneEl.placeholder = tw("filter_zone_placeholder");
+
   document.querySelectorAll("[data-i18n]").forEach((el) => {
     const key = el.dataset.i18n;
     const text = tw(key);
     if (text && text !== key) el.textContent = text;
   });
+
+const filterJobRoleEl = document.getElementById("filterJobRole");
+if (filterJobRoleEl) {
+  const optionMap = {
+    "": tw("filter_all_roles"),
+    "camarero": tw("pos_waiter"),
+    "cocina": tw("pos_kitchen"),
+    "limpieza": tw("pos_cleaning"),
+    "recepcion": tw("pos_reception"),
+    "pica": tw("pos_pica"),
+    "otros": tw("pos_other"),
+  };
+  Array.from(filterJobRoleEl.options).forEach(opt => {
+    if (optionMap[opt.value] !== undefined) {
+      opt.textContent = optionMap[opt.value];
+    }
+  });
+}
 
   if (onboardingTitle) onboardingTitle.textContent = tw("onboarding_title");
   if (onboardingText) onboardingText.textContent = tw("onboarding_text");
@@ -532,6 +582,30 @@ function applyWorkerTranslations() {
   rerenderLists();
   renderNotifications();
 }
+
+filterJobRole?.addEventListener("change", () => renderAvailableJobs(latestJobs));
+filterJobZone?.addEventListener("input",  () => renderAvailableJobs(latestJobs));
+filterJobDate?.addEventListener("change", () => renderAvailableJobs(latestJobs));
+clearJobsFilter?.addEventListener("click", () => {
+  if (filterJobRole) filterJobRole.value = "";
+  if (filterJobZone) filterJobZone.value = "";
+  if (filterJobDate) filterJobDate.value = "";
+  renderAvailableJobs(latestJobs);
+});
+
+const toggleJobsFilter = document.getElementById("toggleJobsFilter");
+const jobsFilter = document.getElementById("jobsFilter");
+
+toggleJobsFilter?.addEventListener("click", () => {
+  const isOpen = jobsFilter?.classList.toggle("open");
+  toggleJobsFilter.classList.toggle("active", isOpen);
+  if (!isOpen) {
+    if (filterJobRole) filterJobRole.value = "";
+    if (filterJobZone) filterJobZone.value = "";
+    if (filterJobDate) filterJobDate.value = "";
+    renderAvailableJobs(latestJobs);
+  }
+});
 
 safeOn(langToggle, "click", (e) => {
   e.stopPropagation();
@@ -629,14 +703,25 @@ safeOn(editProfileModal, "click", (e) => { if (e.target === editProfileModal) cl
 function renderAvailableJobs(jobs) {
   if (!jobsList) return;
   jobsList.innerHTML = "";
-  const available = jobs.filter(j =>
-  !myAppliedJobIds.has(j.id) &&
-  isJobStillAvailable(j)
-);
+
+  const roleVal  = filterJobRole?.value  || "";
+  const zoneVal  = (filterJobZone?.value || "").trim().toLowerCase();
+  const dateVal  = filterJobDate?.value  || "";
+
+  const available = jobs.filter(j => {
+    if (myAppliedJobIds.has(j.id)) return false;
+    if (!isJobStillAvailable(j)) return false;
+    if (roleVal && j.role !== roleVal) return false;
+    if (zoneVal && !(j.zone || "").toLowerCase().includes(zoneVal)) return false;
+    if (dateVal && j.date !== dateVal) return false;
+    return true;
+  });
+
   if (!available.length) {
     jobsList.innerHTML = `<div class="meta">${tw("no_available_jobs")}</div>`;
     return;
   }
+
   available.forEach((j) => {
     const el = document.createElement("div");
     el.className = "item";
@@ -992,11 +1077,11 @@ safeOn(toggleAvail, "click", async () => {
   const snap = await getDoc(doc(db, "users", currentUid));
   const profile = snap.exists() ? snap.data() : {};
   
-  if (!isProfileComplete(profile)) {
-    alert(tw("complete_profile_first"));
-    openProfileModal(); 
-    return;
-  }
+if (!isProfileComplete(profile)) {
+  await showConfirm(tw("complete_profile_first"));
+  openProfileModal();
+  return;
+}
   
   currentAvailable = !currentAvailable;
   setAvailUI(currentAvailable);

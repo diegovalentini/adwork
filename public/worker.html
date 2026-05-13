@@ -133,6 +133,23 @@
               <div class="panel-title-row">
                 <h3 data-i18n="worker_available_jobs">Torns disponibles</h3>
               </div>
+              <button id="toggleJobsFilter" class="filter-toggle-btn" type="button">
+                  🔍 <span data-i18n="filter_btn">Filtrar</span>
+                </button>
+                <div id="jobsFilter" class="filter-bar">
+                  <select id="filterJobRole">
+                    <option value="" data-i18n="filter_all_roles">Tots els llocs</option>
+                    <option value="camarero" data-i18n="pos_waiter">Cambrer</option>
+                    <option value="cocina" data-i18n="pos_kitchen">Cuina</option>
+                    <option value="limpieza" data-i18n="pos_cleaning">Neteja</option>
+                    <option value="recepcion" data-i18n="pos_reception">Recepció</option>
+                    <option value="pica" data-i18n="pos_pica">Pica</option>
+                    <option value="otros" data-i18n="pos_other">Altres</option>
+                  </select>
+                  <input id="filterJobZone" type="text" placeholder="Zona..." />
+                  <input id="filterJobDate" type="date" />
+                  <button id="clearJobsFilter" class="btn" type="button">✕</button>
+                </div>
               <div class="list" id="jobsList"></div>
             </section>
 

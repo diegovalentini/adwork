@@ -187,6 +187,24 @@
               <div class="panel-title-row">
                 <h3 data-i18n="available_workers">Treballadors disponibles</h3>
               </div>
+              <button id="toggleWorkersFilter" class="filter-toggle-btn" type="button">
+                🔍 <span data-i18n="filter_btn">Filtrar</span>
+              </button>
+              <div id="workersFilter" class="filter-bar">
+                <input id="filterWorkerRole" type="text" />
+                <input id="filterWorkerZone" type="text" placeholder="Zona..." />
+                <select id="filterWorkerDay">
+                  <option value="" data-i18n="filter_all_days">Tots els dies</option>
+                  <option value="Lun" data-i18n="day_mon">Dl</option>
+                  <option value="Mar" data-i18n="day_tue">Dm</option>
+                  <option value="Mié" data-i18n="day_wed">Dc</option>
+                  <option value="Jue" data-i18n="day_thu">Dj</option>
+                  <option value="Vie" data-i18n="day_fri">Dv</option>
+                  <option value="Sáb" data-i18n="day_sat">Ds</option>
+                  <option value="Dom" data-i18n="day_sun">Dg</option>
+                </select>
+                <button id="clearWorkersFilter" class="btn" type="button">✕</button>
+              </div>
               <div class="list" id="workersList"></div>
             </section>
 

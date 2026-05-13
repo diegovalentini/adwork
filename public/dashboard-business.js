@@ -80,8 +80,34 @@ const businessTranslations = {
     rejected: "Rebutjat ✅",
     reject_application_confirm: "Vols rebutjar aquesta postulació?",
     notifications_empty: "No tens notificacions.",
+    filter_btn: "Filtrar",
+    filter_all_roles: "Tots els llocs",
+    filter_all_days: "Tots els dies",
+    filter_zone_placeholder: "Zona...",
+    filter_role_placeholder: "Lloc (ex: cambrer)...",
+    day_mon: "Dl", day_tue: "Dm", day_wed: "Dc", day_thu: "Dj",
+    day_fri: "Dv", day_sat: "Ds", day_sun: "Dg",
+    pos_waiter: "Cambrer",
+    pos_kitchen: "Cuina",
+    pos_cleaning: "Neteja",
+    pos_reception: "Recepció",
+    pos_pica: "Pica",
+    pos_other: "Altres",
   },
   es: {
+    pos_waiter: "Camarero",
+    pos_kitchen: "Cocina",
+    pos_cleaning: "Limpieza",
+    pos_reception: "Recepción",
+    pos_pica: "Pica",
+    pos_other: "Otros",
+    filter_btn: "Filtrar",
+    filter_all_roles: "Todos los puestos",
+    filter_all_days: "Todos los días",
+    filter_zone_placeholder: "Zona...",
+    filter_role_placeholder: "Puesto (ej: camarero)...",
+    day_mon: "Lu", day_tue: "Ma", day_wed: "Mi", day_thu: "Ju",
+    day_fri: "Vi", day_sat: "Sá", day_sun: "Do",
     notifications_empty: "No tenés notificaciones.",
     reject_application_confirm: "¿Querés rechazar esta postulación?",
     reject_btn: "Rechazar",
@@ -211,6 +237,11 @@ const notificationsPanel = document.getElementById("notificationsPanel");
 const notificationsBadge = document.getElementById("notificationsBadge");
 const notificationsList = document.getElementById("notificationsList");
 const markNotificationsReadBtn = document.getElementById("markNotificationsReadBtn");
+
+const filterWorkerRole = document.getElementById("filterWorkerRole");
+const filterWorkerZone = document.getElementById("filterWorkerZone");
+const filterWorkerDay  = document.getElementById("filterWorkerDay");
+const clearWorkersFilter = document.getElementById("clearWorkersFilter");
 
 notificationsBtn?.addEventListener("click", (e) => {
   e.stopPropagation();
@@ -400,6 +431,31 @@ function applyBusinessTranslations() {
     const text = tb(key);
     if (text && text !== key) el.textContent = text;
   });
+
+  const filterWorkerDayEl = document.getElementById("filterWorkerDay");
+if (filterWorkerDayEl) {
+  const dayMap = {
+    "": tb("filter_all_days"),
+    "Lun": tb("day_mon"),
+    "Mar": tb("day_tue"),
+    "Mié": tb("day_wed"),
+    "Jue": tb("day_thu"),
+    "Vie": tb("day_fri"),
+    "Sáb": tb("day_sat"),
+    "Dom": tb("day_sun"),
+  };
+  Array.from(filterWorkerDayEl.options).forEach(opt => {
+    if (dayMap[opt.value] !== undefined) {
+      opt.textContent = dayMap[opt.value];
+    }
+  });
+}
+
+  const filterWorkerRoleEl = document.getElementById("filterWorkerRole");
+  if (filterWorkerRoleEl) filterWorkerRoleEl.placeholder = tb("filter_role_placeholder");
+
+  const filterWorkerZoneEl = document.getElementById("filterWorkerZone");
+  if (filterWorkerZoneEl) filterWorkerZoneEl.placeholder = tb("filter_zone_placeholder");
 
   const notesEl = document.getElementById("notes");
   if (notesEl) notesEl.placeholder = tb("notes_placeholder");
@@ -600,7 +656,17 @@ function renderWorkers(workers) {
   latestWorkers = workers || [];
   workersList.innerHTML = "";
 
-  const filtered = (workers || []).filter(w => !myContactWorkerIds.has(w.uid || w.id));
+  const roleVal = (filterWorkerRole?.value || "").trim().toLowerCase();
+  const zoneVal = (filterWorkerZone?.value || "").trim().toLowerCase();
+  const dayVal  = filterWorkerDay?.value || "";
+
+  const filtered = (workers || []).filter(w => {
+    if (myContactWorkerIds.has(w.uid || w.id)) return false;
+    if (roleVal && !(w.bio || "").toLowerCase().includes(roleVal)) return false;
+    if (zoneVal && !(w.location || "").toLowerCase().includes(zoneVal)) return false;
+    if (dayVal && !(w.availableDays || []).includes(dayVal)) return false;
+    return true;
+  });
 
   if (!filtered.length) {
     workersList.innerHTML = `<div class="meta">${tb("no_workers")}</div>`;
@@ -610,7 +676,6 @@ function renderWorkers(workers) {
   filtered.forEach((w) => {
     const photo = w.photoUrl && w.photoUrl.trim() ? w.photoUrl : "icons/default-user.png";
     const workerId = w.uid || w.id;
-
     const el = document.createElement("div");
     el.className = "item";
     el.innerHTML = `
@@ -635,6 +700,30 @@ function renderWorkers(workers) {
     workersList.appendChild(el);
   });
 }
+
+filterWorkerRole?.addEventListener("input",  () => renderWorkers(latestWorkers));
+filterWorkerZone?.addEventListener("input",  () => renderWorkers(latestWorkers));
+filterWorkerDay?.addEventListener("change",  () => renderWorkers(latestWorkers));
+clearWorkersFilter?.addEventListener("click", () => {
+  if (filterWorkerRole) filterWorkerRole.value = "";
+  if (filterWorkerZone) filterWorkerZone.value = "";
+  if (filterWorkerDay)  filterWorkerDay.value  = "";
+  renderWorkers(latestWorkers);
+});
+
+const toggleWorkersFilter = document.getElementById("toggleWorkersFilter");
+const workersFilter = document.getElementById("workersFilter");
+
+toggleWorkersFilter?.addEventListener("click", () => {
+  const isOpen = workersFilter?.classList.toggle("open");
+  toggleWorkersFilter.classList.toggle("active", isOpen);
+  if (!isOpen) {
+    if (filterWorkerRole) filterWorkerRole.value = "";
+    if (filterWorkerZone) filterWorkerZone.value = "";
+    if (filterWorkerDay)  filterWorkerDay.value  = "";
+    renderWorkers(latestWorkers);
+  }
+});
 
 async function renderContacts(contacts) {
   latestSharedContacts = contacts || [];
@@ -1096,7 +1185,7 @@ workersList.addEventListener("click", async (e) => {
     console.error(err);
     btn.disabled = false;
     btn.textContent = prevText || tb("request_contact");
-    alert(err.message || tb("request_error"));
+    await showConfirm(tb("request_error"));
   }
 });
 
