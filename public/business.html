@@ -104,9 +104,13 @@
       </section>
 
       <div class="grid">
-        <section class="card">
-          <h3 data-i18n="publish_shift">Publicar torn</h3>
-          <form id="jobForm" class="grid" style="grid-template-columns:1fr; gap:12px;">
+        <section class="card publish-shift-card">
+            <button type="button" id="togglePublishForm" class="collapse-header">
+              <span data-i18n="publish_shift">Publicar torn</span>
+              <span id="publishFormArrow" class="collapse-arrow">▼</span>
+            </button>
+          
+            <form id="jobForm" class="grid publish-form-body" style="grid-template-columns:1fr; gap:12px;">
             <label>
               <span data-i18n="label_position">Lloc</span>
               <select id="role" required>

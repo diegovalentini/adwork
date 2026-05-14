@@ -960,3 +960,118 @@ label{
 .filter-bar.open {
   display: flex;
 }
+
+/* =========================
+   Collapsible publish form
+========================= */
+
+.collapse-header{
+  width: 100%;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 0;
+  margin-bottom: 14px;
+  font-size: 20px;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: inherit;
+  text-align: left;
+}
+
+.collapse-arrow{
+  width: 34px;
+  height: 34px;
+  border-radius: 12px;
+  background: rgba(255,255,255,0.05);
+  border: 1px solid rgba(220,255,240,0.10);
+  color: var(--success);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  transition: transform .2s ease, background .2s ease;
+}
+
+.publish-shift-card{
+  min-height: auto;
+}
+
+.publish-form-body{
+  overflow: hidden;
+  transition: max-height .25s ease, opacity .2s ease, margin-top .2s ease;
+}
+
+.publish-shift-card.collapsed{
+  justify-content: center;
+}
+
+.publish-shift-card.collapsed .collapse-header{
+  margin-bottom: 0;
+  min-height: 42px;
+}
+
+.publish-shift-card.collapsed .publish-form-body{
+  max-height: 0;
+  opacity: 0;
+  pointer-events: none;
+  margin-top: 0;
+  display: none;
+}
+
+.publish-shift-card:not(.collapsed) .publish-form-body{
+  max-height: 900px;
+  opacity: 1;
+  display: grid;
+}
+
+.publish-shift-card.collapsed .collapse-arrow{
+  transform: rotate(-90deg);
+}
+
+.collapse-header span:first-child{
+  line-height: 1;
+}
+
+@media (max-width: 720px){
+  .publish-shift-card{
+    min-height: auto;
+  }
+
+  .publish-shift-card.collapsed{
+    padding-top: 18px;
+    padding-bottom: 18px;
+  }
+
+  .publish-shift-card:not(.collapsed) .collapse-header{
+    margin-bottom: 14px;
+  }
+}
+
+/* Fix: card publicar turno cerrada */
+.publish-shift-card.collapsed{
+  align-self: start;
+  min-height: 70px;
+  height: auto;
+  padding: 18px 20px;
+  justify-content: center;
+}
+
+.publish-shift-card.collapsed .collapse-header{
+  margin: 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
+}
+
+.publish-shift-card.collapsed .publish-form-body{
+  display: none !important;
+}
+
+.publish-shift-card.collapsed .collapse-arrow{
+  transform: rotate(-90deg);
+}

@@ -15,8 +15,6 @@ const businessTranslations = {
     my_company: "La meva empresa", edit: "Editar",
     no_type: "🏷️ (sense sector)", no_location: "📍 (sense ubicació)",
     publish_shift: "Publicar torn", label_position: "Lloc",
-    pos_waiter: "Cambrer", pos_kitchen: "Cuina", pos_cleaning: "Neteja",
-    pos_reception: "Recepció", pos_pica: "Pica", pos_other: "Altres",
     specify_position: "Especificar lloc", specify_placeholder: "Ex: Bartender, DJ...",
     label_date: "Data", label_from: "Des de", label_to: "Fins",
     label_pay: "Pagament (€ / hora)", label_zone: "Zona (ex: Escaldes)",
@@ -134,8 +132,6 @@ const businessTranslations = {
     my_company: "Mi empresa", edit: "Editar",
     no_type: "🏷️ (sin rubro)", no_location: "📍 (sin locación)",
     publish_shift: "Publicar turno", label_position: "Puesto",
-    pos_waiter: "Camarero", pos_kitchen: "Cocina", pos_cleaning: "Limpieza",
-    pos_reception: "Recepción", pos_pica: "Pica", pos_other: "Otros",
     specify_position: "Especificar puesto", specify_placeholder: "Ej: Bartender, DJ...",
     label_date: "Fecha", label_from: "Desde", label_to: "Hasta",
     label_pay: "Pago (€ / hora)", label_zone: "Zona (ej: Escaldes)",
@@ -186,6 +182,9 @@ function tb(key) { return businessTranslations[getBusinessLang()]?.[key] || key;
 /* =========================
     DOM
 ========================= */
+
+const togglePublishForm = document.getElementById("togglePublishForm");
+const publishShiftCard = document.querySelector(".publish-shift-card");
 const openEditCompany = document.getElementById("openEditCompany");
 const editCompanyModal = document.getElementById("editCompanyModal");
 const closeEditCompany = document.getElementById("closeEditCompany");
@@ -243,6 +242,14 @@ const filterWorkerZone = document.getElementById("filterWorkerZone");
 const filterWorkerDay  = document.getElementById("filterWorkerDay");
 const clearWorkersFilter = document.getElementById("clearWorkersFilter");
 
+
+togglePublishForm?.addEventListener("click", () => {
+  publishShiftCard?.classList.toggle("collapsed");
+
+  const isCollapsed = publishShiftCard?.classList.contains("collapsed");
+  localStorage.setItem("adwork_publish_form_collapsed", isCollapsed ? "true" : "false");
+});
+
 notificationsBtn?.addEventListener("click", (e) => {
   e.stopPropagation();
   notificationsPanel?.classList.toggle("hidden");
@@ -260,6 +267,15 @@ markNotificationsReadBtn?.addEventListener("click", async () => {
 
 let unsubscribeNotifications = null;
 let currentNotifications = [];
+
+const savedPublishState = localStorage.getItem("adwork_publish_form_collapsed");
+
+if (savedPublishState === "true") {
+  publishShiftCard?.classList.add("collapsed");
+}
+if (savedPublishState === null && window.innerWidth <= 720) {
+  publishShiftCard?.classList.add("collapsed");
+}
 
 function startNotificationsListener(uid) {
   if (!uid || !notificationsList) return;
