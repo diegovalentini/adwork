@@ -990,10 +990,16 @@ label{
   background: rgba(255,255,255,0.05);
   border: 1px solid rgba(220,255,240,0.10);
   color: var(--success);
+
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
+
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 1;
+
+  padding-bottom: 2px;
   transition: transform .2s ease, background .2s ease;
 }
 
@@ -1007,12 +1013,18 @@ label{
 }
 
 .publish-shift-card.collapsed{
+  align-self: start;
+  min-height: 70px;
+  height: auto;
+  padding: 18px 20px;
   justify-content: center;
 }
 
 .publish-shift-card.collapsed .collapse-header{
-  margin-bottom: 0;
-  min-height: 42px;
+  margin: 0;
+  min-height: 44px;
+  display: flex;
+  align-items: center;
 }
 
 .publish-shift-card.collapsed .publish-form-body{
@@ -1020,7 +1032,7 @@ label{
   opacity: 0;
   pointer-events: none;
   margin-top: 0;
-  display: none;
+  display: none !important;
 }
 
 .publish-shift-card:not(.collapsed) .publish-form-body{
@@ -1030,7 +1042,7 @@ label{
 }
 
 .publish-shift-card.collapsed .collapse-arrow{
-  transform: rotate(-90deg);
+  transform: rotate(90deg);
 }
 
 .collapse-header span:first-child{
@@ -1050,28 +1062,4 @@ label{
   .publish-shift-card:not(.collapsed) .collapse-header{
     margin-bottom: 14px;
   }
-}
-
-/* Fix: card publicar turno cerrada */
-.publish-shift-card.collapsed{
-  align-self: start;
-  min-height: 70px;
-  height: auto;
-  padding: 18px 20px;
-  justify-content: center;
-}
-
-.publish-shift-card.collapsed .collapse-header{
-  margin: 0;
-  min-height: 44px;
-  display: flex;
-  align-items: center;
-}
-
-.publish-shift-card.collapsed .publish-form-body{
-  display: none !important;
-}
-
-.publish-shift-card.collapsed .collapse-arrow{
-  transform: rotate(-90deg);
 }
