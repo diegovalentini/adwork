@@ -137,8 +137,10 @@ const workerTranslations = {
     pos_reception: "Recepció",
     pos_pica: "Pica",
     pos_other: "Altres",
+    worker_role_display: "Treballador",
   },
   es: {
+    worker_role_display: "Trabajador",
     pos_waiter: "Camarero",
     pos_kitchen: "Cocina",
     pos_cleaning: "Limpieza",
@@ -858,7 +860,7 @@ onAuthStateChanged(auth, async (user) => {
     setAvailUI(currentAvailable);
 
     safeText(pName, profile.name || "—");
-    safeText(pRole, `${tw("role_label")} ${profile.role || "worker"}`);
+    safeText(pRole, tw("worker_role_display"));
     safeSrc(profilePhoto, profile.photoUrl || "icons/default-user.png");
     safeText(pLocation, profile.location ? `📍 ${profile.location}` : tw("location_empty"));
     safeText(pBio, profile.bio ? `📝 ${profile.bio}` : tw("bio_empty"));
